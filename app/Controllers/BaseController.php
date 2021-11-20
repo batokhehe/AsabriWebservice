@@ -2,12 +2,14 @@
 
 namespace App\Controllers;
 
-use CodeIgniter\Controller;
 use CodeIgniter\HTTP\CLIRequest;
 use CodeIgniter\HTTP\IncomingRequest;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
+use CodeIgniter\RESTful\ResourceController;
+use Exception;
+use \Firebase\JWT\JWT;
 
 /**
  * Class BaseController
@@ -19,7 +21,7 @@ use Psr\Log\LoggerInterface;
  *
  * For security be sure to declare any new methods as protected or private.
  */
-class BaseController extends Controller
+class BaseController extends ResourceController
 {
     /**
      * Instance of the main Request object.
@@ -35,7 +37,7 @@ class BaseController extends Controller
      *
      * @var array
      */
-    protected $helpers = [];
+    protected $helpers;
 
     /**
      * Constructor.
@@ -46,7 +48,37 @@ class BaseController extends Controller
         parent::initController($request, $response, $logger);
 
         // Preload any models, libraries, etc, here.
+        // Auth
+        $this->key = $this->getKey();
+        if (empty($request->getHeader('Authorization'))) {
+            $response = [
+                'status' => 401,
+                'error' => true,
+                'messages' => 'Access denied',
+                'data' => []
+            ];
+            return $this->respondCreated($response);
+        }
+        $token = $request->getHeader('Authorization')->getValue();
+        try {
+            $decoded = JWT::decode($token, $this->key, array('HS256'));
+            $this->user = $decoded;
+        } catch (Exception $ex) {
+            $response = [
+                'status' => 401,
+                'error' => true,
+                'messages' => 'Access denied',
+                'data' => []
+            ];
+            return $this->respondCreated($response);
+        }
 
         // E.g.: $this->session = \Config\Services::session();
+
+    }
+
+    private function getKey()
+    {
+        return 'asabri_webservices_123';
     }
 }
