@@ -37,7 +37,7 @@ $routes->group('api', function ($routes) {
     $routes->post('register', 'User::register');
     $routes->post('login', 'User::login');
     $routes->get('profile', 'User::details');
-    $routes->resource('produk');
+    $routes->resource('provinsi');
 });
 
 /*

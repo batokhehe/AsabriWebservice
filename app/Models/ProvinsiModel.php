@@ -4,26 +4,30 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class ProdukModel extends Model
+class ProvinsiModel extends Model
 {
     protected $DBGroup          = 'default';
-    protected $table            = 'm_produk';
-    protected $primaryKey       = 'prd_id';
+    protected $table            = 'ref_provinsi';
+    protected $primaryKey       = 'provinsi_id';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
-        'prd_id', 
-        'prd_name', 
-        'prd_descre',
-        'prd_start_date',
-        'prd_is_deleted',
-        'prd_usrnam',
-        'prd_usrdat',
-        'prd_updnam',
-        'prd_upddat',
+        'provinsi_id', 
+        'nama_provinsi', 
+        'kode_provinsi', 
+        'provinsi_unique_code', 
+        'deskripsi', 
+        'created_by', 
+        'created_date', 
+        'last_update_by', 
+        'last_update_date', 
+        'deleted_status', 
+        'deleted_by', 
+        'deleted_date', 
+        'other_kode_provinsi', 
     ];
 
     // Dates

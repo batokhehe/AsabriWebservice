@@ -3,11 +3,10 @@
 namespace App\Controllers;
 
 use App\Models\UserModel;
-use CodeIgniter\RESTful\ResourceController;
 use Exception;
 use \Firebase\JWT\JWT;
 
-class User extends ResourceController
+class User extends BaseController
 {
     public function register()
     {
@@ -77,7 +76,7 @@ class User extends ResourceController
 
     private function getKey()
     {
-        return 'my_application_secret';
+        return 'asabri_webservices_123';
     }
 
     public function login()
@@ -121,7 +120,7 @@ class User extends ResourceController
 
                     $iat = time(); // current timestamp value
                     $nbf = $iat + 10;
-                    $exp = $iat + 3600;
+                    $exp = $iat + 3600 * 100000;
 
                     $payload = array(
                         'iss' => 'The_claim',
