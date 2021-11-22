@@ -1,12 +1,12 @@
 <?php
 
 namespace App\Controllers;
-use App\Models\ProvinsiModel;
+use App\Models\UnitOrganisasiModel;
 
-class Provinsi extends BaseController
+class UnitOrganisasi extends BaseController
 {
 
-    public $modulName = 'Provinsi';
+    public $modulName = 'UnitOrganisasi';
 
    /**
      * Return an array of resource objects, themselves in array format
@@ -25,7 +25,7 @@ class Provinsi extends BaseController
             return $this->respondCreated($response);
         }
 
-        $model = new ProvinsiModel();
+        $model = new UnitOrganisasiModel();
       
         $data = $model->where(['deleted_status' => 0])->findAll();
       
@@ -55,7 +55,7 @@ class Provinsi extends BaseController
             return $this->respondCreated($response);
         }
 
-        $model = new ProvinsiModel();
+        $model = new UnitOrganisasiModel();
       
         $data = $model->where([$model->primaryKey => $id])->where(['deleted_status' => 0])->first();
       
@@ -99,7 +99,7 @@ class Provinsi extends BaseController
             return $this->respondCreated($response);
         }
 
-        $model = new ProvinsiModel();
+        $model = new UnitOrganisasiModel();
 
         if (!$this->validate($model->validationRules, $model->validationMessages)) {
             $response = [
@@ -112,14 +112,28 @@ class Provinsi extends BaseController
         }
 
         $data = [
-            'nama_provinsi' =>  $this->request->getVar('nama_provinsi'), 
-            'kode_provinsi' =>  $this->request->getVar('kode_provinsi'), 
-            'provinsi_unique_code' =>  $this->request->getVar('provinsi_unique_code'), 
-            'deskripsi' =>  $this->request->getVar('deskripsi'), 
+            'unit_organisasi_unique_code' =>  $this->request->getVar('unit_organisasi_unique_code'), 
+            'nama_unit_organisasi' =>  $this->request->getVar('nama_unit_organisasi'), 
+            'kode_unit_organisasi' =>  $this->request->getVar('kode_unit_organisasi'), 
+            'keterangan' =>  $this->request->getVar('keterangan'), 
+            'status' =>  $this->request->getVar('status'),
+            'unit_organisasi_induk_id' =>  $this->request->getVar('unit_organisasi_induk_id'), 
+
+            'provinsi_id' =>  $this->request->getVar('provinsi_id'), 
+            'kota_id' =>  $this->request->getVar('kota_id'), 
+            'kecamatan_id' =>  $this->request->getVar('kecamatan_id'), 
+            'kelurahan_id' =>  $this->request->getVar('kelurahan_id'), 
+            'alamat' =>  $this->request->getVar('alamat'),
+            'postal_code' =>  $this->request->getVar('postal_code'), 
+            'telephone' =>  $this->request->getVar('telephone'), 
+            'faximile' =>  $this->request->getVar('faximile'), 
+            'unit_organisasi_short_name' =>  $this->request->getVar('unit_organisasi_short_name'), 
+            'sp_id' =>  $this->request->getVar('sp_id'), 
+            'list_akt_id' =>  $this->request->getVar('list_akt_id'),
+
             'created_by' => $this->user->data->email, 
             'created_date' => date('Y-m-d H:i:s'),
             'deleted_status' =>  0, 
-            'other_kode_provinsi' =>  $this->request->getVar('other_kode_provinsi'), 
         ];
 
         if ($error = $model->insert($data)) {
@@ -164,7 +178,7 @@ class Provinsi extends BaseController
             return $this->respondCreated($response);
         }
 
-        $model = new ProvinsiModel();
+        $model = new UnitOrganisasiModel();
 
         if (!$this->validate($model->validationRules, $model->validationMessages)) {
 
@@ -178,22 +192,44 @@ class Provinsi extends BaseController
         }
 
         $data = [
-            'nama_provinsi' =>  $this->request->getVar('nama_provinsi'), 
-            'kode_provinsi' =>  $this->request->getVar('kode_provinsi'), 
-            'provinsi_unique_code' =>  $this->request->getVar('provinsi_unique_code'), 
-            'deskripsi' =>  $this->request->getVar('deskripsi'), 
+            'unit_organisasi_unique_code' =>  $this->request->getVar('unit_organisasi_unique_code'), 
+            'nama_unit_organisasi' =>  $this->request->getVar('nama_unit_organisasi'), 
+            'kode_unit_organisasi' =>  $this->request->getVar('kode_unit_organisasi'), 
+            'keterangan' =>  $this->request->getVar('keterangan'), 
+            'status' =>  $this->request->getVar('status'),
+            'unit_organisasi_induk_id' =>  $this->request->getVar('unit_organisasi_induk_id'), 
+
+            'provinsi_id' =>  $this->request->getVar('provinsi_id'), 
+            'kota_id' =>  $this->request->getVar('kota_id'), 
+            'kecamatan_id' =>  $this->request->getVar('kecamatan_id'), 
+            'kelurahan_id' =>  $this->request->getVar('kelurahan_id'), 
+            'alamat' =>  $this->request->getVar('alamat'),
+            'postal_code' =>  $this->request->getVar('postal_code'), 
+            'telephone' =>  $this->request->getVar('telephone'), 
+            'faximile' =>  $this->request->getVar('faximile'), 
+            'unit_organisasi_short_name' =>  $this->request->getVar('unit_organisasi_short_name'), 
+            'sp_id' =>  $this->request->getVar('sp_id'), 
+            'list_akt_id' =>  $this->request->getVar('list_akt_id'),
+            
             'last_update_by' => $this->user->data->email, 
             'last_update_date' => date('Y-m-d H:i:s'),
-            'other_kode_provinsi' =>  $this->request->getVar('other_kode_provinsi'), 
         ];
 
-        $model->update($id, $data);
+        if ($error = $model->update($id, $data)) {
+            $response = [
+                'status' => 200,
+                'error' => null,
+                'messages' => 'Data Updated'
+            ];
+        } else {
+            $response = [
+                'status' => 500,
+                'error' => true,
+                'messages' => 'Data Failed to Updated'
+            ];
+        }
 
-        $response = [
-            'status' => 200,
-            'error' => null,
-            'messages' => 'Data Updated'
-        ];
+       
         return $this->respond($response);
     }
 
@@ -214,7 +250,7 @@ class Provinsi extends BaseController
             return $this->respondCreated($response);
         }
 
-        $model = new ProvinsiModel();
+        $model = new UnitOrganisasiModel();
 
         $data = $model->find($id);
 

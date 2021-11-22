@@ -1,12 +1,12 @@
 <?php
 
 namespace App\Controllers;
-use App\Models\ProvinsiModel;
+use App\Models\KotaModel;
 
-class Provinsi extends BaseController
+class Kota extends BaseController
 {
 
-    public $modulName = 'Provinsi';
+    public $modulName = 'Kota';
 
    /**
      * Return an array of resource objects, themselves in array format
@@ -25,7 +25,7 @@ class Provinsi extends BaseController
             return $this->respondCreated($response);
         }
 
-        $model = new ProvinsiModel();
+        $model = new KotaModel();
       
         $data = $model->where(['deleted_status' => 0])->findAll();
       
@@ -55,7 +55,7 @@ class Provinsi extends BaseController
             return $this->respondCreated($response);
         }
 
-        $model = new ProvinsiModel();
+        $model = new KotaModel();
       
         $data = $model->where([$model->primaryKey => $id])->where(['deleted_status' => 0])->first();
       
@@ -99,7 +99,7 @@ class Provinsi extends BaseController
             return $this->respondCreated($response);
         }
 
-        $model = new ProvinsiModel();
+        $model = new KotaModel();
 
         if (!$this->validate($model->validationRules, $model->validationMessages)) {
             $response = [
@@ -112,14 +112,15 @@ class Provinsi extends BaseController
         }
 
         $data = [
-            'nama_provinsi' =>  $this->request->getVar('nama_provinsi'), 
-            'kode_provinsi' =>  $this->request->getVar('kode_provinsi'), 
-            'provinsi_unique_code' =>  $this->request->getVar('provinsi_unique_code'), 
+            'kota_unique_code' =>  $this->request->getVar('kota_unique_code'), 
+            'nama_kota' =>  $this->request->getVar('nama_kota'), 
+            'kode_kota' =>  $this->request->getVar('kode_kota'), 
             'deskripsi' =>  $this->request->getVar('deskripsi'), 
+            'provinsi_id' =>  $this->request->getVar('provinsi_id'),
+            'other_kode_kota' =>  $this->request->getVar('other_kode_kota'), 
             'created_by' => $this->user->data->email, 
             'created_date' => date('Y-m-d H:i:s'),
             'deleted_status' =>  0, 
-            'other_kode_provinsi' =>  $this->request->getVar('other_kode_provinsi'), 
         ];
 
         if ($error = $model->insert($data)) {
@@ -164,7 +165,7 @@ class Provinsi extends BaseController
             return $this->respondCreated($response);
         }
 
-        $model = new ProvinsiModel();
+        $model = new KotaModel();
 
         if (!$this->validate($model->validationRules, $model->validationMessages)) {
 
@@ -178,22 +179,31 @@ class Provinsi extends BaseController
         }
 
         $data = [
-            'nama_provinsi' =>  $this->request->getVar('nama_provinsi'), 
-            'kode_provinsi' =>  $this->request->getVar('kode_provinsi'), 
-            'provinsi_unique_code' =>  $this->request->getVar('provinsi_unique_code'), 
+            'kota_unique_code' =>  $this->request->getVar('kota_unique_code'), 
+            'nama_kota' =>  $this->request->getVar('nama_kota'), 
+            'kode_kota' =>  $this->request->getVar('kode_kota'), 
             'deskripsi' =>  $this->request->getVar('deskripsi'), 
+            'provinsi_id' =>  $this->request->getVar('provinsi_id'),
+            'other_kode_kota' =>  $this->request->getVar('other_kode_kota'), 
             'last_update_by' => $this->user->data->email, 
             'last_update_date' => date('Y-m-d H:i:s'),
-            'other_kode_provinsi' =>  $this->request->getVar('other_kode_provinsi'), 
         ];
 
-        $model->update($id, $data);
+        if ($error = $model->update($id, $data)) {
+            $response = [
+                'status' => 200,
+                'error' => null,
+                'messages' => 'Data Updated'
+            ];
+        } else {
+            $response = [
+                'status' => 500,
+                'error' => true,
+                'messages' => 'Data Failed to Updated'
+            ];
+        }
 
-        $response = [
-            'status' => 200,
-            'error' => null,
-            'messages' => 'Data Updated'
-        ];
+       
         return $this->respond($response);
     }
 
@@ -214,7 +224,7 @@ class Provinsi extends BaseController
             return $this->respondCreated($response);
         }
 
-        $model = new ProvinsiModel();
+        $model = new KotaModel();
 
         $data = $model->find($id);
 

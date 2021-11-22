@@ -38,6 +38,10 @@ $routes->group('api', function ($routes) {
     $routes->post('login', 'User::login');
     $routes->get('profile', 'User::details');
     $routes->resource('provinsi');
+    $routes->resource('kota');
+    $routes->resource('kecamatan');
+    $routes->resource('kelurahan');
+    $routes->resource('unitOrganisasi');
 });
 
 /*

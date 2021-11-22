@@ -38,8 +38,30 @@ class ProvinsiModel extends Model
     protected $deletedField  = 'deleted_at';
 
     // Validation
-    protected $validationRules      = [];
-    protected $validationMessages   = [];
+    protected $validationRules      = [
+            'nama_provinsi' => 'required', 
+            'kode_provinsi' => 'required',
+            'provinsi_unique_code' => 'required|is_unique[ref_provinsi.provinsi_unique_code]',
+            'deskripsi' => 'required',
+            'other_kode_provinsi' => 'required'
+        ];
+    protected $validationMessages   = [
+            'nama_provinsi' => [
+                'required' => 'Nama Provinsi is required'
+            ],
+            'kode_provinsi' => [
+                'required' => 'Kode Provinsi is required',
+            ],
+            'provinsi_unique_code' => [
+                'required' => 'Kode Unik Provinsi is required'
+            ],
+            'deskripsi' => [
+                'required' => 'Deskripsi Provinsi is required'
+            ],
+            'other_kode_provinsi' => [
+                'required' => 'Kode Lain Provinsi is required'
+            ],
+        ];
     protected $skipValidation       = false;
     protected $cleanValidationRules = true;
 
