@@ -48,7 +48,19 @@ $routes->group('api', function ($routes) {
     $routes->resource('BintangJasa');
     $routes->resource('CacatGolongan');
     $routes->resource('CacatTingkat');
-    $routes->resource('JenisRelasi');
+    // untested
+    $routes->resource('jenisHutang');
+    $routes->resource('jenisKlaim');
+    $routes->resource('jenisMutasi');
+    $routes->resource('jenisProduk');
+    $routes->resource('jenisRelasi');
+    $routes->resource('mataAnggaran');
+    $routes->resource('pekerjaan');
+    $routes->resource('statusKlaim');
+    $routes->resource('statusPeserta');
+    $routes->resource('tipeDokumen');
+    $routes->resource('tipePembayaran');
+    // untested
 });
 
 /*
