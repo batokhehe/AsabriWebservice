@@ -37,11 +37,18 @@ $routes->group('api', function ($routes) {
     $routes->post('register', 'User::register');
     $routes->post('login', 'User::login');
     $routes->get('profile', 'User::details');
-    $routes->resource('provinsi');
-    $routes->resource('kota');
-    $routes->resource('kecamatan');
-    $routes->resource('kelurahan');
-    $routes->resource('unitOrganisasi');
+    $routes->resource('Provinsi');
+    $routes->resource('Kota');
+    $routes->resource('Kecamatan');
+    $routes->resource('Kelurahan');
+    $routes->resource('UnitOrganisasi');
+    $routes->resource('Kesatuan');
+    $routes->resource('Pangkat');
+    $routes->resource('PangkatKesatuan');
+    $routes->resource('BintangJasa');
+    $routes->resource('CacatGolongan');
+    $routes->resource('CacatTingkat');
+    $routes->resource('JenisRelasi');
 });
 
 /*
