@@ -124,16 +124,17 @@ class Kecamatan extends BaseController
             'deleted_status' =>  0, 
         ];
 
-        if ($error = $model->insert($data)) {
+        if ($error = $model->insert($data) === FALSE) {
+            $response = [
+                'status' => 500,
+                'error' => true,
+                'messages' => $this->modulName . ' Gagal Tersimpan = ' . $error ];
+            
+        } else {
             $response = [
                 'status' => 200,
                 'error' => null,
                 'messages' => $this->modulName . ' Berhasil Tersimpan' ];
-        } else {
-             $response = [
-                'status' => 500,
-                'error' => true,
-                'messages' => $this->modulName . ' Gagal Tersimpan = ' . $error ];
         }
       
         return $this->respondCreated($response);

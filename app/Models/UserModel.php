@@ -7,18 +7,28 @@ use CodeIgniter\Model;
 class UserModel extends Model
 {
     protected $DBGroup              = 'default';
-    protected $table                = 'users';
-    protected $primaryKey           = 'id';
+    protected $table                = 'mst_user';
+    protected $primaryKey           = 'user_id';
     protected $useAutoIncrement     = true;
     protected $insertID             = 0;
     protected $returnType           = 'array';
     protected $useSoftDelete        = false;
     protected $protectFields        = true;
     protected $allowedFields        = [
-        'name', 
-        'email', 
-        'phone_no',
-        'password'
+        'user_id',
+        'user_unique_code',
+        'nama_user',
+        'kode_user',
+        'user_login',
+        'user_password',
+        'email',
+        'created_by',
+        'created_date',
+        'last_update_by',
+        'last_update_date',
+        'deleted_by',
+        'deleted_date',
+        'deleted_status',
     ];
 
     // Dates

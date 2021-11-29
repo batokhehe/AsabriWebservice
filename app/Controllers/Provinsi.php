@@ -112,6 +112,7 @@ class Provinsi extends BaseController
         }
 
         $data = [
+            'provinsi_id' => 1,
             'nama_provinsi' =>  $this->request->getVar('nama_provinsi'), 
             'kode_provinsi' =>  $this->request->getVar('kode_provinsi'), 
             'provinsi_unique_code' =>  $this->request->getVar('provinsi_unique_code'), 
@@ -122,16 +123,16 @@ class Provinsi extends BaseController
             'other_kode_provinsi' =>  $this->request->getVar('other_kode_provinsi'), 
         ];
 
-        if ($error = $model->insert($data)) {
+        if ($error = $model->insert($data) === FALSE) {
             $response = [
-                'status' => 200,
-                'error' => null,
-                'messages' => $this->modulName . ' Berhasil Tersimpan' ];
-        } else {
-             $response = [
                 'status' => 500,
                 'error' => true,
                 'messages' => $this->modulName . ' Gagal Tersimpan = ' . $error ];
+        } else {
+             $response = [
+                'status' => 200,
+                'error' => null,
+                'messages' => $this->modulName . ' Berhasil Tersimpan' ];
         }
       
         return $this->respondCreated($response);

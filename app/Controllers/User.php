@@ -11,24 +11,28 @@ class User extends BaseController
     public function register()
     {
         $rules = [
-            'name' => 'required',
-            'email' => 'required|valid_email|is_unique[users.email]|min_length[6]',
-            'phone_no' => 'required',
-            'password' => 'required',
+            'nama_user' => 'required',
+            'user_unique_code' => 'required|is_unique[mst_user.user_unique_code]',
+            'kode_user' => 'required|is_unique[mst_user.kode_user]',
+            'email' => 'required|valid_email|is_unique[mst_user.email]|min_length[6]',
+            'user_password' => 'required',
         ];
 
         $messages = [
-            'name' => [
+            'nama_user' => [
                 'required' => 'Name is required'
+            ],
+            'user_unique_code' => [
+                'required' => 'Kode Unik is required'
+            ],
+            'kode_user' => [
+                'required' => 'Kode is required'
             ],
             'email' => [
                 'required' => 'Email required',
                 'valid_email' => 'Email address is not in format'
             ],
-            'phone_no' => [
-                'required' => 'Phone Number is required'
-            ],
-            'password' => [
+            'user_password' => [
                 'required' => 'password is required'
             ],
         ];
@@ -41,35 +45,28 @@ class User extends BaseController
                 'message' => $this->validator->getErrors(),
                 'data' => []
             ];
-        } else {
+        } 
 
-            $userModel = new UserModel();
+        $userModel = new UserModel();
 
-            $data = [
-                'name' => $this->request->getVar('name'),
-                'email' => $this->request->getVar('email'),
-                'phone_no' => $this->request->getVar('phone_no'),
-                'password' => password_hash($this->request->getVar('password'), PASSWORD_DEFAULT),
-            ];
+        $data = [
+            'user_id' => 1,
+            'nama_user' => $this->request->getVar('nama_user'),
+            'user_unique_code' => $this->request->getVar('user_unique_code'),
+            'kode_user' => $this->request->getVar('kode_user'),
+            'email' => $this->request->getVar('email'),
+            'user_login' => $this->request->getVar('email'),
+            'user_password' => password_hash($this->request->getVar('user_password'), PASSWORD_DEFAULT),
+        ];
 
-            if ($userModel->insert($data)) {
+        $userModel->insert($data);
 
-                $response = [
-                    'status' => 200,
-                    'error' => false,
-                    'messages' => 'Successfully, user has been registered',
-                    'data' => []
-                ];
-            } else {
-
-                $response = [
-                    'status' => 500,
-                    'error' => true,
-                    'messages' => 'Failed to create user',
-                    'data' => []
-                ];
-            }
-        }
+        $response = [
+            'status' => 200,
+            'error' => false,
+            'messages' => 'Successfully, user has been registered',
+            'data' => []
+        ];
 
         return $this->respondCreated($response);
     }
@@ -82,17 +79,17 @@ class User extends BaseController
     public function login()
     {
         $rules = [
-            'email' => 'required|valid_email|min_length[6]',
-            'password' => 'required',
+            'user_login' => 'required|valid_email|min_length[6]',
+            'user_password' => 'required',
         ];
 
         $messages = [
-            'email' => [
-                'required' => 'Email required',
-                'valid_email' => 'Email address is not in format'
+            'user_login' => [
+                'required' => 'User login required',
+                'valid_email' => 'User login is not in format'
             ],
-            'password' => [
-                'required' => 'password is required'
+            'user_password' => [
+                'required' => 'User password is required'
             ],
         ];
 
@@ -110,11 +107,11 @@ class User extends BaseController
         } else {
             $userModel = new UserModel();
 
-            $userdata = $userModel->where('email', $this->request->getVar('email'))->first();
+            $userdata = $userModel->where('user_login', $this->request->getVar('user_login'))->first();
 
             if (!empty($userdata)) {
 
-                if (password_verify($this->request->getVar('password'), $userdata['password'])) {
+                if (password_verify($this->request->getVar('user_password'), $userdata['user_password'])) {
 
                     $key = $this->getKey();
 

@@ -1,12 +1,12 @@
 <?php
 
 namespace App\Controllers;
-use App\Models\CacatTingkatModel;
+use App\Models\PembayaranKlaimManfaatModel;
 
-class CacatTingkat extends BaseController
+class PembayaranKlaimManfaat extends BaseController
 {
 
-    public $modulName = 'CacatTingkat';
+    public $modulName = 'PembayaranKlaimManfaat';
 
    /**
      * Return an array of resource objects, themselves in array format
@@ -24,10 +24,8 @@ class CacatTingkat extends BaseController
             ];
             return $this->respondCreated($response);
         }
-
-        $model = new CacatTingkatModel();
       
-        $data = $model->where(['deleted_status' => 0])->findAll();
+        $data = PembayaranKlaimManfaatModel::getAll();
       
         $response = [
             'status' => 200,
@@ -55,16 +53,14 @@ class CacatTingkat extends BaseController
             return $this->respondCreated($response);
         }
 
-        $model = new CacatTingkatModel();
-      
-        $data = $model->where([$model->primaryKey => $id])->where(['deleted_status' => 0])->first();
-      
-        if ($data) {
+        $result = PembayaranKlaimManfaatModel::findById($id);
+
+        if ($result) {
             $response = [
                 'status' => 200,
                 'error' => null,
                 'messages' => $this->modulName . ' Found',
-                'data' => $data,
+                'data' => $result,
             ];
             return $this->respond($response);
         } else {
@@ -99,7 +95,7 @@ class CacatTingkat extends BaseController
             return $this->respondCreated($response);
         }
 
-        $model = new CacatTingkatModel();
+        $model = new PembayaranKlaimManfaatModel();
 
         if (!$this->validate($model->validationRules, $model->validationMessages)) {
             $response = [
@@ -111,23 +107,12 @@ class CacatTingkat extends BaseController
             return $this->respondCreated($response);
         }
 
-        $data = [
-            'cacat_tingkat_unique_code' =>  $this->request->getVar('cacat_tingkat_unique_code'), 
-            'nama_cacat_tingkat' =>  $this->request->getVar('nama_cacat_tingkat'), 
-            'kode_cacat_tingkat' =>  $this->request->getVar('kode_cacat_tingkat'), 
-            'keterangan' =>  $this->request->getVar('keterangan'), 
-            'STATUS' =>  $this->request->getVar('STATUS'),  
-            
-            'created_by' => $this->user->data->email, 
-            'created_date' => date('Y-m-d H:i:s'),
-            'deleted_status' =>  0, 
-        ];
-
-        if ($error = $model->insert($data) === FALSE) {
+        $result = PembayaranKlaimManfaatModel::createNew($this->request, $this->user);
+        if ($result === FALSE) {
             $response = [
                 'status' => 500,
                 'error' => true,
-                'messages' => $this->modulName . ' Gagal Tersimpan = ' . $error ];  
+                'messages' => $this->modulName . ' Gagal Tersimpan = ' . $error ]; 
         } else {
             $response = [
                 'status' => 200,
@@ -165,7 +150,7 @@ class CacatTingkat extends BaseController
             return $this->respondCreated($response);
         }
 
-        $model = new CacatTingkatModel();
+        $model = new PembayaranKlaimManfaatModel();
 
         if (!$this->validate($model->validationRules, $model->validationMessages)) {
 
@@ -178,32 +163,20 @@ class CacatTingkat extends BaseController
             return $this->respondCreated($response);
         }
 
-        $data = [
-            'cacat_tingkat_unique_code' =>  $this->request->getVar('cacat_tingkat_unique_code'), 
-            'nama_cacat_tingkat' =>  $this->request->getVar('nama_cacat_tingkat'), 
-            'kode_cacat_tingkat' =>  $this->request->getVar('kode_cacat_tingkat'), 
-            'keterangan' =>  $this->request->getVar('keterangan'), 
-            'STATUS' =>  $this->request->getVar('STATUS'),  
-            
-            'last_update_by' => $this->user->data->email, 
-            'last_update_date' => date('Y-m-d H:i:s'),
-        ];
-
-        if ($error = $model->update($id, $data)) {
-            $response = [
-                'status' => 200,
-                'error' => null,
-                'messages' => 'Data Updated'
-            ];
-        } else {
+        $result = PembayaranKlaimManfaatModel::updateData($id, $this->request, $this->user);
+        if ($result === FALSE) {
             $response = [
                 'status' => 500,
                 'error' => true,
                 'messages' => 'Data Failed to Updated'
             ];
+        } else {
+            $response = [
+                'status' => 200,
+                'error' => null,
+                'messages' => 'Data Updated'
+            ];
         }
-
-       
         return $this->respond($response);
     }
 
@@ -224,30 +197,31 @@ class CacatTingkat extends BaseController
             return $this->respondCreated($response);
         }
 
-        $model = new CacatTingkatModel();
+         // check availability
+        if (PembayaranKlaimManfaatModel::findById($id) === FALSE){
+            return $this->respondCreated([
+                'status' => 404,
+                'error' => true,
+                'message' => 'Designated data to delete not found',
+                'data' => []
+            ]);
+        }
 
-        $data = $model->find($id);
+        $result = PembayaranKlaimManfaatModel::softDelete($id, $this->user);
 
-        if ($data) {
-
-            // $model->delete($id);
-
-            $data = [
-                'deleted_status' => 1, 
-                'deleted_by' => $this->user->data->email, 
-                'deleted_date' => date('Y-m-d H:i:s'),
+        if ($result === FALSE) {
+            $response = [
+                'status' => 500,
+                'error' => true,
+                'messages' => 'Data Failed to Deleted'
             ];
-
-        $model->update($id, $data);
-
+        } else {
             $response = [
                 'status' => 200,
                 'error' => null,
-                'messages' => 'Data Deleted',
+                'messages' => 'Data Deleted'
             ];
-            return $this->respondDeleted($response);
-        } else {
-            return $this->failNotFound('No Data Found with id ' . $id);
         }
+        return $this->respond($response);
     }
 }
