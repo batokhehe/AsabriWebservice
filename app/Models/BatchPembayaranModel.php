@@ -92,17 +92,17 @@ class BatchPembayaranModel extends Model
     protected $afterDelete    = [];
 
     public static function getAll(){
-        $model = new PesertaModel();
+        $model = new BatchPembayaranModel();
         return $model->where(['deleted_status'=> 0])->findAll();
     }
 
     public static function findById($id){
-        $model = new PesertaModel();
+        $model = new BatchPembayaranModel();
         return $model->where([$model->primaryKey => $id])->where(['deleted_status'=> 0])->first();
     }
 
     public static function createNew($request, $user){
-        $model = new PesertaModel();
+        $model = new BatchPembayaranModel();
         return $model->insert([
             'batch_pembayaran_id'=> $request->getVar('batch_pembayaran_id'),
             'batch_pembayaran_unique_code'=> $request->getVar('batch_pembayaran_unique_code'),
@@ -139,7 +139,7 @@ class BatchPembayaranModel extends Model
     }
 
     public static function updateData($id, $request, $user){
-        $model = new PesertaModel();
+        $model = new BatchPembayaranModel();
         return $model->update($id, [
             'batch_pembayaran_id'=> $request->getVar('batch_pembayaran_id'),
             'batch_pembayaran_unique_code'=> $request->getVar('batch_pembayaran_unique_code'),
@@ -175,7 +175,7 @@ class BatchPembayaranModel extends Model
     }
 
     public static function softDelete($id, $user){
-        $model = new PesertaModel();
+        $model = new BatchPembayaranModel();
         $model->update($id,[
             'deleted_status'=> 1,
             'deleted_by'=> $user->data->email,
