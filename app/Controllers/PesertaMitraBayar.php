@@ -1,12 +1,12 @@
 <?php
 
 namespace App\Controllers;
-use App\Models\PesertaModel;
+use App\Models\PesertaMitraBayarModel;
 
-class Peserta extends BaseController
+class PesertaMitraBayar extends BaseController
 {
 
-    public $modulName = 'Peserta';
+    public $modulName = 'PesertaMitraBayar';
 
    /**
      * Return an array of resource objects, themselves in array format
@@ -25,7 +25,7 @@ class Peserta extends BaseController
             return $this->respondCreated($response);
         }
       
-        $data = PesertaModel::getAll();
+        $data = PesertaMitraBayarModel::getAll();
       
         $response = [
             'status' => 200,
@@ -53,7 +53,7 @@ class Peserta extends BaseController
             return $this->respondCreated($response);
         }
 
-        $result = PesertaModel::findById($id);
+        $result = PesertaMitraBayarModel::findById($id);
 
         if ($result) {
             $response = [
@@ -95,7 +95,7 @@ class Peserta extends BaseController
             return $this->respondCreated($response);
         }
 
-        $model = new PesertaModel();
+        $model = new PesertaMitraBayarModel();
 
         if (!$this->validate($model->validationRules, $model->validationMessages)) {
             $response = [
@@ -107,17 +107,17 @@ class Peserta extends BaseController
             return $this->respondCreated($response);
         }
 
-        if ($model->createNew($model, $this->request, $this->user) === FALSE) {
+        $result = PesertaMitraBayarModel::createNew($this->request, $this->user);
+        if ($result === FALSE) {
             $response = [
                 'status' => 500,
                 'error' => true,
-                'messages' => $this->modulName . ' Gagal Tersimpan',
-                'params' => $model->errors() ]; 
+                'messages' => $this->modulName . ' Gagal Tersimpan = ' . $error ]; 
         } else {
             $response = [
                 'status' => 200,
                 'error' => null,
-                'messages' => $this->modulName . ' Berhasil Tersimpan '];
+                'messages' => $this->modulName . ' Berhasil Tersimpan' ];
         }
       
         return $this->respondCreated($response);
@@ -150,7 +150,7 @@ class Peserta extends BaseController
             return $this->respondCreated($response);
         }
 
-        $model = new PesertaModel();
+        $model = new PesertaMitraBayarModel();
 
         if (!$this->validate($model->validationRules, $model->validationMessages)) {
 
@@ -163,7 +163,7 @@ class Peserta extends BaseController
             return $this->respondCreated($response);
         }
 
-        $result = PesertaModel::updateData($id, $this->request, $this->user);
+        $result = PesertaMitraBayarModel::updateData($id, $this->request, $this->user);
         if ($result === FALSE) {
             $response = [
                 'status' => 500,
@@ -198,7 +198,7 @@ class Peserta extends BaseController
         }
 
          // check availability
-        if (PesertaModel::findById($id) === FALSE){
+        if (PesertaMitraBayarModel::findById($id) === FALSE){
             return $this->respondCreated([
                 'status' => 404,
                 'error' => true,
@@ -207,7 +207,7 @@ class Peserta extends BaseController
             ]);
         }
 
-        $result = PesertaModel::softDelete($id, $this->user);
+        $result = PesertaMitraBayarModel::softDelete($id, $this->user);
 
         if ($result === FALSE) {
             $response = [

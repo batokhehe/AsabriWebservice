@@ -7,8 +7,8 @@ use CodeIgniter\Model;
 class PesertaModel extends Model
 {
     protected $DBGroup          = 'default';
-    protected $table            = 'ref_cacat_tingkat';
-    protected $primaryKey       = 'cacat_tingkat_id';
+    protected $table            = 'mst_peserta';
+    protected $primaryKey       = 'peserta_id';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
     protected $returnType       = 'array';
@@ -252,9 +252,9 @@ class PesertaModel extends Model
         return $model->where([$model->primaryKey => $id])->where(['deleted_status' => 0])->first();
     }
 
-    public static function createNew($request, $user){
-        $model = new PesertaModel();
+    public static function createNew($model, $request, $user){
         return $model->insert([
+            'peserta_id'=> $request->getVar('peserta_id'),
             'peserta_unique_code'=> $request->getVar('peserta_unique_code'),
             'nama_peserta'=> $request->getVar('nama_peserta'),
             'nomor_identitas_peserta'=> $request->getVar('nomor_identitas_peserta'),
@@ -346,6 +346,7 @@ class PesertaModel extends Model
             'nomor_keterangan_sekolah_anak'=> $request->getVar('nomor_keterangan_sekolah_anak'),
             'tanggal_mulai_hilang'=> $request->getVar('tanggal_mulai_hilang'),
             'tanggal_akhir_hilang'=> $request->getVar('tanggal_akhir_hilang'),
+            'kesatuan_awal_id'=> $request->getVar('kesatuan_awal_id'),
             'nama_kesatuan_awal'=> $request->getVar('nama_kesatuan_awal'),
             'is_irja'=> $request->getVar('is_irja'),
             'is_punah'=> $request->getVar('is_punah'),
@@ -355,6 +356,7 @@ class PesertaModel extends Model
             'created_by' => $user->data->email,
             'deleted_status' =>  0, 
         ]) ;
+
     }
 
     public static function updateData($id, $request, $user){
@@ -381,12 +383,12 @@ class PesertaModel extends Model
             'kelurahan_id'=> $request->getVar('kelurahan_id'),
             'nama_kelurahan'=> $request->getVar('nama_kelurahan'),
             'kelurahan_unique_code'=> $request->getVar('kelurahan_unique_code'),
-            'tanggal_lahir'=> $request->getVar('tanggal_lahir'),
+            'tanggal_lahir'=> date('Y-m-d', strtotime($request->getVar('tanggal_lahir'))),
             'tempat_lahir'=> $request->getVar('tempat_lahir'),
             'jenis_kelamin'=> $request->getVar('jenis_kelamin'),
-            'tanggal_pengangkatan'=> $request->getVar('tanggal_pengangkatan'),
+            'tanggal_pengangkatan'=> date('Y-m-d', strtotime($request->getVar('tanggal_pengangkatan'))),
             'nomor_skep_pengangkatan'=> $request->getVar('nomor_skep_pengangkatan'),
-            'tanggal_skep_pengangkatan'=> $request->getVar('tanggal_skep_pengangkatan'),
+            'tanggal_skep_pengangkatan'=> date('Y-m-d', strtotime($request->getVar('tanggal_skep_pengangkatan'))),
             'pangkat_awal_id'=> $request->getVar('pangkat_awal_id'),
             'nama_pangkat_awal'=> $request->getVar('nama_pangkat_awal'),
             'nama_kesatuan'=> $request->getVar('nama_kesatuan'),
@@ -410,7 +412,7 @@ class PesertaModel extends Model
             'status_perkawinan'=> $request->getVar('status_perkawinan'),
             'nama_pasangan'=> $request->getVar('nama_pasangan'),
             'nomor_skep_sprtn'=> $request->getVar('nomor_skep_sprtn'),
-            'tanggal_skep_sprtn'=> $request->getVar('tanggal_skep_sprtn'),
+            'tanggal_skep_sprtn'=> date('Y-m-d', strtotime($request->getVar('tanggal_skep_sprtn'))),
             'data_from_spp'=> $request->getVar('data_from_spp'),
             'spp_is_approve'=> $request->getVar('spp_is_approve'),
             'data_spp_reason'=> $request->getVar('data_spp_reason'),
@@ -432,7 +434,7 @@ class PesertaModel extends Model
             'peserta_date_end'=> $request->getVar('peserta_date_end'),
             'peserta_skep_date_end'=> $request->getVar('peserta_skep_date_end'),
             'nomor_skep_end'=> $request->getVar('nomor_skep_end'),
-            'tanggal_skep_alih'=> $request->getVar('tanggal_skep_alih'),
+            'tanggal_skep_alih'=> date('Y-m-d', strtotime($request->getVar('tanggal_skep_alih'))),
             'satuan_kerja'=> $request->getVar('satuan_kerja'),
             'nama_pdw'=> $request->getVar('nama_pdw'),
             'pendelegasian_wewenang_id'=> $request->getVar('pendelegasian_wewenang_id'),
@@ -440,17 +442,18 @@ class PesertaModel extends Model
             'status_hidup'=> $request->getVar('status_hidup'),
             'kj_code'=> $request->getVar('kj_code'),
             'nomor_batch'=> $request->getVar('nomor_batch'),
-            'tanggal_batch'=> $request->getVar('tanggal_batch'),
+            'tanggal_batch'=> date('Y-m-d', strtotime($request->getVar('tanggal_batch'))),
             'nomor_agenda'=> $request->getVar('nomor_agenda'),
             'nomor_dps'=> $request->getVar('nomor_dps'),
             'is_from_pulta'=> $request->getVar('is_from_pulta'),
             'peserta_pasangan_id'=> $request->getVar('peserta_pasangan_id'),
             'email'=> $request->getVar('email'),
             'password'=> $request->getVar('password'),
-            'tanggal_meninggal'=> $request->getVar('tanggal_meninggal'),
+            'tanggal_meninggal'=> date('Y-m-d', strtotime($request->getVar('tanggal_meninggal'))),
             'nomor_keterangan_sekolah_anak'=> $request->getVar('nomor_keterangan_sekolah_anak'),
-            'tanggal_mulai_hilang'=> $request->getVar('tanggal_mulai_hilang'),
-            'tanggal_akhir_hilang'=> $request->getVar('tanggal_akhir_hilang'),
+            'tanggal_mulai_hilang'=> date('Y-m-d', strtotime($request->getVar('tanggal_mulai_hilang'))),
+            'tanggal_akhir_hilang'=> date('Y-m-d', strtotime($request->getVar('tanggal_akhir_hilang'))),
+            'kesatuan_awal_id'=> $request->getVar('kesatuan_awal_id'),
             'nama_kesatuan_awal'=> $request->getVar('nama_kesatuan_awal'),
             'is_irja'=> $request->getVar('is_irja'),
             'is_punah'=> $request->getVar('is_punah'),
