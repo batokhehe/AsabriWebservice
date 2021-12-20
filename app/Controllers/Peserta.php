@@ -112,7 +112,8 @@ class Peserta extends BaseController
                 'status' => 500,
                 'error' => true,
                 'messages' => $this->modulName . ' Gagal Tersimpan',
-                'params' => $model->errors() ]; 
+                'params' => $model->errors(),
+            ]; 
         } else {
             $response = [
                 'status' => 200,

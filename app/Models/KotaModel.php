@@ -90,4 +90,62 @@ class KotaModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+     public static function getAll(){
+        $model = new KotaModel();
+        return $model->where(['deleted_status' => 0])->findAll();
+    }
+
+    public static function findById($id){
+        $model = new KotaModel();
+        return $model->where([$model->primaryKey => $id])->where(['deleted_status' => 0])->first();
+    }
+
+    public static function createNew($model, $request, $user){
+        return $model->insert([
+            $model->primaryKey => $model->getAvailableId($model),
+            'kota_unique_code' =>  $request->getVar('kota_unique_code'), 
+            'nama_kota' =>  $request->getVar('nama_kota'), 
+            'kode_kota' =>  $request->getVar('kode_kota'), 
+            'deskripsi' =>  $request->getVar('deskripsi'), 
+            'provinsi_id' =>  $request->getVar('provinsi_id'),
+            'other_kode_kota' =>  $request->getVar('other_kode_kota'), 
+            'created_by' => $user->data->email, 
+            'created_date' => date('Y-m-d H:i:s'),
+            'deleted_status' =>  0, 
+            'other_kode_provinsi' =>  $request->getVar('other_kode_provinsi'), 
+        ]);
+    }
+
+    public static function updateData($id, $model, $request, $user){
+        return $model->update($id, [
+            'kota_unique_code' =>  $request->getVar('kota_unique_code'), 
+            'nama_kota' =>  $request->getVar('nama_kota'), 
+            'kode_kota' =>  $request->getVar('kode_kota'), 
+            'deskripsi' =>  $request->getVar('deskripsi'), 
+            'provinsi_id' =>  $request->getVar('provinsi_id'),
+            'other_kode_kota' =>  $request->getVar('other_kode_kota'), 
+            'last_update_by' => $user->data->email, 
+            'last_update_date' => date('Y-m-d H:i:s'),
+            'other_kode_provinsi' =>  $request->getVar('other_kode_provinsi'), 
+        ]);
+    }
+
+     public static function softDelete($id, $model, $user){
+        return $model->update($id,[
+            'deleted_status' => 1,
+            'deleted_by' => $user->data->email,
+            'deleted_date' => date('Y-m-d H:i:s')
+        ]);
+    }
+
+    public function getAvailableId($model){
+        $result = $model->findAll();
+        if (count($result) > 0) {
+            return $result[count($result) - 1][$model->primaryKey] + 1;
+        } else {
+            return 1;
+        }
+
+    }
 }

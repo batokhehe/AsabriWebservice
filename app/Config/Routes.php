@@ -62,6 +62,9 @@ $routes->group('api', function ($routes) {
     $routes->resource('batchPembayaran');
     $routes->resource('pesertaHutang');
 
+    //Peserta
+    $routes->resource('kantorCabang');
+
     // untested
     $routes->resource('jenisHutang');
     $routes->resource('jenisKlaim');

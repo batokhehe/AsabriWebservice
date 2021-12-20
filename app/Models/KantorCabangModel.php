@@ -67,7 +67,6 @@ class KantorCabangModel extends Model
 
     // Validation
     protected $validationRules      = [
-		'kantor_cabang_id' => 'required',
 		'kantor_cabang_unique_code' => 'required',
 		'nama_kantor_cabang' => 'required',
 		'kode_kantor_cabang' => 'required',
@@ -75,13 +74,13 @@ class KantorCabangModel extends Model
 		'keterangan' => 'required',
 		'status' => 'required',
 		'provinsi_id' => 'required',
-		'nama_provinsi' => 'required',
+		// 'nama_provinsi' => 'required',
 		'kota_id' => 'required',
-		'nama_kota' => 'required',
+		// 'nama_kota' => 'required',
 		'kecamatan_id' => 'required',
-		'nama_kecamatan' => 'required',
+		// 'nama_kecamatan' => 'required',
 		'kelurahan_id' => 'required',
-		'nama_kelurahan' => 'required',
+		// 'nama_kelurahan' => 'required',
 		'pimpinan' => 'required',
 		'telephone' => 'required',
 		'postal_code' => 'required',
@@ -128,10 +127,9 @@ class KantorCabangModel extends Model
         return $model->where([$model->primaryKey => $id])->where(['deleted_status'=> 0])->first();
     }
 
-    public static function createNew($request, $user){
-        $model = new KantorCabangModel();
+    public static function createNew($model, $request, $user){
         return $model->insert([
-			'kantor_cabang_id' => $request->getVar('kantor_cabang_id'),
+            $model->primaryKey => $model->getAvailableId($model),
 			'kantor_cabang_unique_code' => $request->getVar('kantor_cabang_unique_code'),
 			'nama_kantor_cabang' => $request->getVar('nama_kantor_cabang'),
 			'kode_kantor_cabang' => $request->getVar('kode_kantor_cabang'),
@@ -172,10 +170,8 @@ class KantorCabangModel extends Model
         ]) ;
     }
 
-    public static function updateData($id, $request, $user){
-        $model = new KantorCabangModel();
+    public static function updateData($id, $model, $request, $user){
         return $model->update($id, [
-			'kantor_cabang_id' => $request->getVar('kantor_cabang_id'),
 			'kantor_cabang_unique_code' => $request->getVar('kantor_cabang_unique_code'),
 			'nama_kantor_cabang' => $request->getVar('nama_kantor_cabang'),
 			'kode_kantor_cabang' => $request->getVar('kode_kantor_cabang'),
@@ -215,12 +211,21 @@ class KantorCabangModel extends Model
         ]);
     }
 
-    public static function softDelete($id, $user){
-        $model = new KantorCabangModel();
-        $model->update($id,[
-            'deleted_status'=> 1,
-            'deleted_by'=> $user->data->email,
-            'deleted_date'=> date('Y-m-d H:i:s')
+    public static function softDelete($id, $model, $user){
+        return $model->update($id,[
+            'deleted_status' => 1,
+            'deleted_by' => $user->data->email,
+            'deleted_date' => date('Y-m-d H:i:s')
         ]);
+    }
+
+    public function getAvailableId($model){
+        $result = $model->findAll();
+        if (count($result) > 0) {
+            return $result[count($result) - 1][$model->primaryKey] + 1;
+        } else {
+            return 1;
+        }
+
     }
 }

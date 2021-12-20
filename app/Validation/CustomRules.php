@@ -4,9 +4,11 @@ namespace App\Validation;
 use App\Models\ProvinsiModel;
 use App\Models\KotaModel;
 use App\Models\KecamatanModel;
+use App\Models\KelurahanModel;
 use App\Models\UnitOrganisasiModel;
 use App\Models\PangkatModel;
 use App\Models\KesatuanModel;
+use App\Models\KantorCabangModel;
 
 class CustomRules
 {
@@ -40,6 +42,16 @@ class CustomRules
         }
     }
 
+    public function is_kelurahan_exists($id) {
+        $model = new KecamatanModel();
+        $data = $model->where([$model->primaryKey => $id])->where(['deleted_status' => 0])->findAll();
+        if (count($data) > 0){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public function is_unit_organisasi_exists($id) {
         $model = new UnitOrganisasiModel();
         $data = $model->where([$model->primaryKey => $id])->where(['deleted_status' => 0])->findAll();
@@ -62,6 +74,16 @@ class CustomRules
 
     public function is_kesatuan_exists($id) {
         $model = new KesatuanModel();
+        $data = $model->where([$model->primaryKey => $id])->where(['deleted_status' => 0])->findAll();
+        if (count($data) > 0){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+     public function is_kantor_cabang_exists($id) {
+        $model = new KantorCabangModel();
         $data = $model->where([$model->primaryKey => $id])->where(['deleted_status' => 0])->findAll();
         if (count($data) > 0){
             return true;

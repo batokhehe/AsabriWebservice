@@ -61,7 +61,7 @@ class KesatuanModel extends Model
 
     // Validation
     protected $validationRules      = [
-            'kesatuan_unique_code' => 'required|is_unique[ref_kesatuan.kesatuan_unique_code]',
+            'kesatuan_unique_code' => 'required|is_unique[mst_kesatuan.kesatuan_unique_code]',
             'nama_kesatuan' => 'required', 
             'kode_kesatuan' => 'required',
             'deskripsi' => 'required',
@@ -75,11 +75,11 @@ class KesatuanModel extends Model
             'telephone' => 'required',
             'nomor_po_box' => 'required',
             'faximile' => 'required',
-            'kantor_cabang_id' => 'required',
+            'kantor_cabang_id' => 'required|is_kantor_cabang_exists[kantor_cabang_id]',
         ];
     protected $validationMessages   = [
             'kesatuan_unique_code' => [
-                'required' => 'Kesatuan Kelurahan is required'
+                'required' => 'Kode Kesatuan is required'
             ],
             'nama_kesatuan' => [
                 'required' => 'Nama Kesatuan is required',
@@ -144,4 +144,82 @@ class KesatuanModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+     public static function getAll(){
+        $model = new KesatuanModel();
+        return $model->where(['deleted_status' => 0])->findAll();
+    }
+
+    public static function findById($id){
+        $model = new KesatuanModel();
+        return $model->where([$model->primaryKey => $id])->where(['deleted_status' => 0])->first();
+    }
+
+    public static function createNew($model, $request, $user){
+        return $model->insert([
+            $model->primaryKey => $model->getAvailableId($model),
+            'kesatuan_unique_code' =>  $request->getVar('kesatuan_unique_code'), 
+            'nama_kesatuan' =>  $request->getVar('nama_kesatuan'), 
+            'kode_kesatuan' =>  $request->getVar('kode_kesatuan'), 
+            'deskripsi' =>  $request->getVar('deskripsi'), 
+
+            'provinsi_id' =>  $request->getVar('provinsi_id'), 
+            'kota_id' =>  $request->getVar('kota_id'), 
+            'kecamatan_id' =>  $request->getVar('kecamatan_id'), 
+            'kelurahan_id' =>  $request->getVar('kelurahan_id'), 
+            'alamat' =>  $request->getVar('alamat'),
+            'kode_pos' =>  $request->getVar('kode_pos'), 
+            'telephone' =>  $request->getVar('telephone'), 
+            'nomor_po_box' =>  $request->getVar('nomor_po_box'), 
+            'faximile' =>  $request->getVar('faximile'), 
+            'kantor_cabang_id' =>  $request->getVar('kantor_cabang_id'), 
+            'unit_organisasi_id' =>  $request->getVar('unit_organisasi_id'), 
+
+            'created_by' => $user->data->email, 
+            'created_date' => date('Y-m-d H:i:s'),
+            'deleted_status' =>  0, 
+        ]);
+    }
+
+    public static function updateData($id, $model, $request, $user){
+        return $model->update($id, [
+            'kesatuan_unique_code' =>  $request->getVar('kesatuan_unique_code'), 
+            'nama_kesatuan' =>  $request->getVar('nama_kesatuan'), 
+            'kode_kesatuan' =>  $request->getVar('kode_kesatuan'), 
+            'deskripsi' =>  $request->getVar('deskripsi'), 
+
+            'provinsi_id' =>  $request->getVar('provinsi_id'), 
+            'kota_id' =>  $request->getVar('kota_id'), 
+            'kecamatan_id' =>  $request->getVar('kecamatan_id'), 
+            'kelurahan_id' =>  $request->getVar('kelurahan_id'), 
+            'alamat' =>  $request->getVar('alamat'),
+            'kode_pos' =>  $request->getVar('kode_pos'), 
+            'telephone' =>  $request->getVar('telephone'), 
+            'nomor_po_box' =>  $request->getVar('nomor_po_box'), 
+            'faximile' =>  $request->getVar('faximile'), 
+            'kantor_cabang_id' =>  $request->getVar('kantor_cabang_id'), 
+            'unit_organisasi_id' =>  $request->getVar('unit_organisasi_id'), 
+            
+            'last_update_by' => $user->data->email, 
+            'last_update_date' => date('Y-m-d H:i:s'),
+        ]);
+    }
+
+     public static function softDelete($id, $model, $user){
+        return $model->update($id,[
+            'deleted_status' => 1,
+            'deleted_by' => $user->data->email,
+            'deleted_date' => date('Y-m-d H:i:s')
+        ]);
+    }
+
+    public function getAvailableId($model){
+        $result = $model->findAll();
+        if (count($result) > 0) {
+            return $result[count($result) - 1][$model->primaryKey] + 1;
+        } else {
+            return 1;
+        }
+
+    }
 }

@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Controllers;
-use App\Models\UnitOrganisasiModel;
+use App\Models\KesatuanModel;
 
 class Kesatuan extends BaseController
 {
@@ -13,7 +13,7 @@ class Kesatuan extends BaseController
      *
      * @return mixed
      */
-    public function index()
+     public function index()
     {
         if (empty($this->user)) {
             $response = [
@@ -24,10 +24,8 @@ class Kesatuan extends BaseController
             ];
             return $this->respondCreated($response);
         }
-
-        $model = new UnitOrganisasiModel();
       
-        $data = $model->where(['deleted_status' => 0])->findAll();
+        $data = KesatuanModel::getAll();
       
         $response = [
             'status' => 200,
@@ -55,16 +53,14 @@ class Kesatuan extends BaseController
             return $this->respondCreated($response);
         }
 
-        $model = new UnitOrganisasiModel();
-      
-        $data = $model->where([$model->primaryKey => $id])->where(['deleted_status' => 0])->first();
-      
-        if ($data) {
+        $result = KesatuanModel::findById($id);
+
+        if ($result) {
             $response = [
                 'status' => 200,
                 'error' => null,
                 'messages' => $this->modulName . ' Found',
-                'data' => $data,
+                'data' => $result,
             ];
             return $this->respond($response);
         } else {
@@ -99,7 +95,7 @@ class Kesatuan extends BaseController
             return $this->respondCreated($response);
         }
 
-        $model = new UnitOrganisasiModel();
+        $model = new KesatuanModel();
 
         if (!$this->validate($model->validationRules, $model->validationMessages)) {
             $response = [
@@ -111,38 +107,18 @@ class Kesatuan extends BaseController
             return $this->respondCreated($response);
         }
 
-        $data = [
-            'kesatuan_unique_code' =>  $this->request->getVar('kesatuan_unique_code'), 
-            'nama_kesatuan' =>  $this->request->getVar('nama_kesatuan'), 
-            'kode_kesatuan' =>  $this->request->getVar('kode_kesatuan'), 
-            'desckripsi' =>  $this->request->getVar('desckripsi'), 
-
-            'provinsi_id' =>  $this->request->getVar('provinsi_id'), 
-            'kota_id' =>  $this->request->getVar('kota_id'), 
-            'kecamatan_id' =>  $this->request->getVar('kecamatan_id'), 
-            'kelurahan_id' =>  $this->request->getVar('kelurahan_id'), 
-            'alamat' =>  $this->request->getVar('alamat'),
-            'kode_pos' =>  $this->request->getVar('kode_pos'), 
-            'telephone' =>  $this->request->getVar('telephone'), 
-            'nomor_po_box' =>  $this->request->getVar('nomor_po_box'), 
-            'faximile' =>  $this->request->getVar('faximile'), 
-            'kantor_cabang_id' =>  $this->request->getVar('kantor_cabang_id'), 
-
-            'created_by' => $this->user->data->email, 
-            'created_date' => date('Y-m-d H:i:s'),
-            'deleted_status' =>  0, 
-        ];
-
-        if ($error = $model->insert($data) === FALSE) {
+        if ($model->createNew($model, $this->request, $this->user) === FALSE) {
             $response = [
                 'status' => 500,
                 'error' => true,
-                'messages' => $this->modulName . ' Gagal Tersimpan = ' . $error ];
+                'messages' => $this->modulName . ' Gagal Tersimpan',
+                'params' => $model->errors(),
+            ]; 
         } else {
             $response = [
                 'status' => 200,
                 'error' => null,
-                'messages' => $this->modulName . ' Berhasil Tersimpan' ];
+                'messages' => $this->modulName . ' Berhasil Tersimpan '];
         }
       
         return $this->respondCreated($response);
@@ -175,7 +151,7 @@ class Kesatuan extends BaseController
             return $this->respondCreated($response);
         }
 
-        $model = new UnitOrganisasiModel();
+        $model = new KesatuanModel();
 
         if (!$this->validate($model->validationRules, $model->validationMessages)) {
 
@@ -188,43 +164,21 @@ class Kesatuan extends BaseController
             return $this->respondCreated($response);
         }
 
-        $data = [
-            'kesatuan_unique_code' =>  $this->request->getVar('kesatuan_unique_code'), 
-            'nama_kesatuan' =>  $this->request->getVar('nama_kesatuan'), 
-            'kode_kesatuan' =>  $this->request->getVar('kode_kesatuan'), 
-            'desckripsi' =>  $this->request->getVar('desckripsi'), 
-
-            'provinsi_id' =>  $this->request->getVar('provinsi_id'), 
-            'kota_id' =>  $this->request->getVar('kota_id'), 
-            'kecamatan_id' =>  $this->request->getVar('kecamatan_id'), 
-            'kelurahan_id' =>  $this->request->getVar('kelurahan_id'), 
-            'alamat' =>  $this->request->getVar('alamat'),
-            'kode_pos' =>  $this->request->getVar('kode_pos'), 
-            'telephone' =>  $this->request->getVar('telephone'), 
-            'nomor_po_box' =>  $this->request->getVar('nomor_po_box'), 
-            'faximile' =>  $this->request->getVar('faximile'), 
-            'kantor_cabang_id' =>  $this->request->getVar('kantor_cabang_id'), 
-            
-            'last_update_by' => $this->user->data->email, 
-            'last_update_date' => date('Y-m-d H:i:s'),
-        ];
-
-        if ($error = $model->update($id, $data)) {
-            $response = [
-                'status' => 200,
-                'error' => null,
-                'messages' => 'Data Updated'
-            ];
-        } else {
+        if ($model->updateData($id, $model, $this->request, $this->user) === FALSE) {
             $response = [
                 'status' => 500,
                 'error' => true,
-                'messages' => 'Data Failed to Updated'
-            ];
+                'messages' => $this->modulName . ' Gagal Tersimpan',
+                'params' => $model->errors(),
+            ]; 
+        } else {
+            $response = [
+                'status' => 200,
+                'error' => null,
+                'messages' => $this->modulName . ' Berhasil Tersimpan '];
         }
-
-       
-        return $this->respond($response);
+      
+        return $this->respondCreated($response);
     }
 
     /**
@@ -234,6 +188,7 @@ class Kesatuan extends BaseController
      */
     public function delete($id = null)
     {
+        $model = new KesatuanModel();
         if (empty($this->user)) {
             $response = [
                 'status' => 401,
@@ -244,30 +199,31 @@ class Kesatuan extends BaseController
             return $this->respondCreated($response);
         }
 
-        $model = new UnitOrganisasiModel();
+         // check availability
+        if ($model->findById($id) === FALSE){
+            return $this->respondCreated([
+                'status' => 404,
+                'error' => true,
+                'message' => 'Designated data to delete not found',
+                'data' => []
+            ]);
+        }
 
-        $data = $model->find($id);
+        $result = $model->softDelete($id, $model, $this->user);
 
-        if ($data) {
-
-            // $model->delete($id);
-
-            $data = [
-                'deleted_status' => 1, 
-                'deleted_by' => $this->user->data->email, 
-                'deleted_date' => date('Y-m-d H:i:s'),
+        if ($result === FALSE) {
+            $response = [
+                'status' => 500,
+                'error' => true,
+                'messages' => 'Data Failed to Deleted'
             ];
-
-        $model->update($id, $data);
-
+        } else {
             $response = [
                 'status' => 200,
                 'error' => null,
-                'messages' => 'Data Deleted',
+                'messages' => 'Data Deleted'
             ];
-            return $this->respondDeleted($response);
-        } else {
-            return $this->failNotFound('No Data Found with id ' . $id);
         }
+        return $this->respond($response);
     }
 }
