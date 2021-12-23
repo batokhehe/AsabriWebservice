@@ -91,4 +91,64 @@ class PangkatModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+    public static function getAll(){
+        $model = new PangkatModel();
+        return $model->where(['deleted_status' => 0])->findAll();
+    }
+
+    public static function findById($id){
+        $model = new PangkatModel();
+        return $model->where([$model->primaryKey => $id])->where(['deleted_status' => 0])->first();
+    }
+
+    public static function createNew($model, $request, $user){
+        return $model->insert([
+            $model->primaryKey => $model->getAvailableId($model),
+            'pangkat_unique_code' =>  $request->getVar('pangkat_unique_code'), 
+            'nama_pangkat' =>  $request->getVar('nama_pangkat'), 
+            'kode_pangkat' =>  $request->getVar('kode_pangkat'), 
+            'keterangan' =>  $request->getVar('keterangan'), 
+            'status' =>  $request->getVar('status'), 
+            'kelompok_pangkat_id' =>  $request->getVar('kelompok_pangkat_id'), 
+            'unit_organisasi_id' =>  $request->getVar('unit_organisasi_id'), 
+
+            'created_by' => $user->data->email, 
+            'created_date' => date('Y-m-d H:i:s'),
+            'deleted_status' =>  0, 
+        ]);
+    }
+
+    public static function updateData($id, $model, $request, $user){
+        return $model->update($id, [
+            'pangkat_unique_code' =>  $request->getVar('pangkat_unique_code'), 
+            'nama_pangkat' =>  $request->getVar('nama_pangkat'), 
+            'kode_pangkat' =>  $request->getVar('kode_pangkat'), 
+            'keterangan' =>  $request->getVar('keterangan'), 
+            'status' =>  $request->getVar('status'), 
+            'kelompok_pangkat_id' =>  $request->getVar('kelompok_pangkat_id'), 
+            'unit_organisasi_id' =>  $request->getVar('unit_organisasi_id'), 
+            
+            'last_update_by' => $user->data->email, 
+            'last_update_date' => date('Y-m-d H:i:s'),
+        ]);
+    }
+
+    public static function softDelete($id, $model, $user){
+        return $model->update($id,[
+            'deleted_status' => 1,
+            'deleted_by' => $user->data->email,
+            'deleted_date' => date('Y-m-d H:i:s')
+        ]);
+    }
+
+    public function getAvailableId($model){
+        $result = $model->findAll();
+        if (count($result) > 0) {
+            return $result[count($result) - 1][$model->primaryKey] + 1;
+        } else {
+            return 1;
+        }
+
+    }
 }

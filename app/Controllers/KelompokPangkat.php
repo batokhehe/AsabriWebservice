@@ -1,12 +1,12 @@
 <?php
 
 namespace App\Controllers;
-use App\Models\PangkatModel;
+use App\Models\KelompokPangkatModel;
 
-class Pangkat extends BaseController
+class KelompokPangkat extends BaseController
 {
 
-    public $modulName = 'Pangkat';
+    public $modulName = 'KelompokPangkat';
 
    /**
      * Return an array of resource objects, themselves in array format
@@ -25,7 +25,7 @@ class Pangkat extends BaseController
             return $this->respondCreated($response);
         }
       
-        $data = PangkatModel::getAll();
+        $data = KelompokPangkatModel::getAll();
       
         $response = [
             'status' => 200,
@@ -53,7 +53,7 @@ class Pangkat extends BaseController
             return $this->respondCreated($response);
         }
 
-        $result = PangkatModel::findById($id);
+        $result = KelompokPangkatModel::findById($id);
 
         if ($result) {
             $response = [
@@ -95,7 +95,7 @@ class Pangkat extends BaseController
             return $this->respondCreated($response);
         }
 
-        $model = new PangkatModel();
+        $model = new KelompokPangkatModel();
 
         if (!$this->validate($model->validationRules, $model->validationMessages)) {
             $response = [
@@ -151,7 +151,7 @@ class Pangkat extends BaseController
             return $this->respondCreated($response);
         }
 
-        $model = new PangkatModel();
+        $model = new KelompokPangkatModel();
 
         if (!$this->validate($model->validationRules, $model->validationMessages)) {
 
@@ -188,7 +188,7 @@ class Pangkat extends BaseController
      */
     public function delete($id = null)
     {
-        $model = new PangkatModel();
+        $model = new KelompokPangkatModel();
         if (empty($this->user)) {
             $response = [
                 'status' => 401,

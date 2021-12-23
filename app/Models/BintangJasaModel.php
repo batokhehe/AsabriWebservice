@@ -103,4 +103,70 @@ class BintangJasaModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+     public static function getAll(){
+        $model = new BintangJasaModel();
+        return $model->where(['deleted_status' => 0])->findAll();
+    }
+
+    public static function findById($id){
+        $model = new BintangJasaModel();
+        return $model->where([$model->primaryKey => $id])->where(['deleted_status' => 0])->first();
+    }
+
+    public static function createNew($model, $request, $user){
+        return $model->insert([
+            $model->primaryKey => $model->getAvailableId($model),
+            'bintang_jasa_unique_code' =>  $request->getVar('bintang_jasa_unique_code'), 
+            'nama_bintang_jasa' =>  $request->getVar('nama_bintang_jasa'), 
+            'kode_bintang_jasa' =>  $request->getVar('kode_bintang_jasa'), 
+            'deskripsi' =>  $request->getVar('deskripsi'), 
+            'is_aktif' =>  $request->getVar('is_aktif'),  
+            'is_add_tunjangan' =>  $request->getVar('is_add_tunjangan'),  
+            'tanggal_mulai' =>  $request->getVar('tanggal_mulai'),  
+            'tanggal_akhir' =>  $request->getVar('tanggal_akhir'),  
+            'kesatuan_id' =>  $request->getVar('kesatuan_id'),  
+            'nilai_tunjangan_bulanan' =>  $request->getVar('nilai_tunjangan_bulanan'), 
+
+            'created_by' => $user->data->email, 
+            'created_date' => date('Y-m-d H:i:s'),
+            'deleted_status' =>  0, 
+        ]);
+    }
+
+    public static function updateData($id, $model, $request, $user){
+        return $model->update($id, [
+            'bintang_jasa_unique_code' =>  $request->getVar('bintang_jasa_unique_code'), 
+            'nama_bintang_jasa' =>  $request->getVar('nama_bintang_jasa'), 
+            'kode_bintang_jasa' =>  $request->getVar('kode_bintang_jasa'), 
+            'deskripsi' =>  $request->getVar('deskripsi'), 
+            'is_aktif' =>  $request->getVar('is_aktif'),  
+            'is_add_tunjangan' =>  $request->getVar('is_add_tunjangan'),  
+            'tanggal_mulai' =>  $request->getVar('tanggal_mulai'),  
+            'tanggal_akhir' =>  $request->getVar('tanggal_akhir'),  
+            'kesatuan_id' =>  $request->getVar('kesatuan_id'),  
+            'nilai_tunjangan_bulanan' =>  $request->getVar('nilai_tunjangan_bulanan'), 
+            
+            'last_update_by' => $user->data->email, 
+            'last_update_date' => date('Y-m-d H:i:s'),
+        ]);
+    }
+
+     public static function softDelete($id, $model, $user){
+        return $model->update($id,[
+            'deleted_status' => 1,
+            'deleted_by' => $user->data->email,
+            'deleted_date' => date('Y-m-d H:i:s')
+        ]);
+    }
+
+    public function getAvailableId($model){
+        $result = $model->findAll();
+        if (count($result) > 0) {
+            return $result[count($result) - 1][$model->primaryKey] + 1;
+        } else {
+            return 1;
+        }
+
+    }
 }

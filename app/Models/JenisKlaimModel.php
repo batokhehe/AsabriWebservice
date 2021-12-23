@@ -39,8 +39,38 @@ class JenisKlaimModel extends Model
     protected $deletedField  = 'deleted_date';
 
     // Validation
-    protected $validationRules      = [];
-    protected $validationMessages   = [];
+    protected $validationRules      = [
+        'nama_jenis_klaim' => 'required', 
+        'kode_jenis_klaim' => 'required',
+        'jenis_klaim_unique_code' => 'required|is_unique[ref_jenis_klaim.jenis_klaim_unique_code]',
+        'deskripsi' => 'required',
+        'kode_pembayaran' => 'required',
+        'is_provider' => 'required',
+        'is_peserta' => 'required'
+    ];
+    protected $validationMessages   = [
+        'nama_jenis_klaim' => [
+            'required' => 'Nama Jenis Klaim is required'
+        ],
+        'kode_jenis_klaim' => [
+            'required' => 'Kode Jenis Klaim is required',
+        ],
+        'jenis_klaim_unique_code' => [
+            'required' => 'Kode Unik Jenis Klaim is required'
+        ],
+        'deskripsi' => [
+            'required' => 'Deskripsi Jenis Klaim is required'
+        ],
+        'kode_pemnbayaran' => [
+            'required' => 'Kode Pembayaran Jenis Klaim is required'
+        ],
+        'is_provider' => [
+            'required' => 'Is Provider Jenis Klaim is required'
+        ],
+        'is_peserta' => [
+            'required' => 'Is Peserta Jenis Klaim is required'
+        ],
+    ];
     protected $skipValidation       = false;
     protected $cleanValidationRules = true;
 
@@ -55,8 +85,7 @@ class JenisKlaimModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-
-    public static function getAll(){
+     public static function getAll(){
         $model = new JenisKlaimModel();
         return $model->where(['deleted_status' => 0])->findAll();
     }
@@ -66,21 +95,24 @@ class JenisKlaimModel extends Model
         return $model->where([$model->primaryKey => $id])->where(['deleted_status' => 0])->first();
     }
 
-    public static function createNew($request, $user){
-        $model = new JenisKlaimModel();
+    public static function createNew($model, $request, $user){
         return $model->insert([
+            $model->primaryKey => $model->getAvailableId($model),
             'jenis_klaim_unique_code' => $request->getVar('jenis_klaim_unique_code'),
             'nama_jenis_klaim' => $request->getVar('nama_jenis_klaim'),
             'kode_jenis_klaim' => $request->getVar('kode_jenis_klaim'),
             'kode_pembayaran' => $request->getVar('kode_pembayaran'),
             'is_provider' => $request->getVar('is_provider'),
             'is_peserta' => $request->getVar('is_peserta'),
-            'created_by' => $user->data->email,
-        ]) ;
+            'deskripsi' => $request->getVar('deskripsi'),
+
+            'created_by' => $user->data->email, 
+            'created_date' => date('Y-m-d H:i:s'),
+            'deleted_status' =>  0, 
+        ]);
     }
 
-    public static function updateData($id, $request, $user){
-        $model = new JenisKlaimModel();
+    public static function updateData($id, $model, $request, $user){
         return $model->update($id, [
             'jenis_klaim_unique_code' => $request->getVar('jenis_klaim_unique_code'),
             'nama_jenis_klaim' => $request->getVar('nama_jenis_klaim'),
@@ -88,16 +120,28 @@ class JenisKlaimModel extends Model
             'kode_pembayaran' => $request->getVar('kode_pembayaran'),
             'is_provider' => $request->getVar('is_provider'),
             'is_peserta' => $request->getVar('is_peserta'),
-            'updated_by' => $user->data->email,
+            'deskripsi' => $request->getVar('deskripsi'),
+            
+            'last_update_by' => $user->data->email, 
+            'last_update_date' => date('Y-m-d H:i:s'),
         ]);
     }
 
-    public static function softDelete($id, $user){
-        $model = new JenisKlaimModel();
-        $model->update($id,[
+     public static function softDelete($id, $model, $user){
+        return $model->update($id,[
             'deleted_status' => 1,
             'deleted_by' => $user->data->email,
             'deleted_date' => date('Y-m-d H:i:s')
         ]);
+    }
+
+    public function getAvailableId($model){
+        $result = $model->findAll();
+        if (count($result) > 0) {
+            return $result[count($result) - 1][$model->primaryKey] + 1;
+        } else {
+            return 1;
+        }
+
     }
 }

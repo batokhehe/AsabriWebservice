@@ -75,4 +75,62 @@ class CacatGolonganModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+     public static function getAll(){
+        $model = new CacatGolonganModel();
+        return $model->where(['deleted_status' => 0])->findAll();
+    }
+
+    public static function findById($id){
+        $model = new CacatGolonganModel();
+        return $model->where([$model->primaryKey => $id])->where(['deleted_status' => 0])->first();
+    }
+
+    public static function createNew($model, $request, $user){
+        return $model->insert([
+            $model->primaryKey => $model->getAvailableId($model),
+            'cacat_golongan_unique_code' =>  $request->getVar('cacat_golongan_unique_code'), 
+            'nama_cacat_golongan' =>  $request->getVar('nama_cacat_golongan'), 
+            'kode_cacat_golongan' =>  $request->getVar('kode_cacat_golongan'), 
+            'keterangan' =>  $request->getVar('keterangan'), 
+            'STATUS' =>  $request->getVar('STATUS'),  
+
+            'created_by' => $user->data->email, 
+            'created_date' => date('Y-m-d H:i:s'),
+            'deleted_status' =>  0, 
+        ]);
+    }
+
+    public static function updateData($id, $model, $request, $user){
+        return $model->update($id, [
+            'cacat_golongan_unique_code' =>  $request->getVar('cacat_golongan_unique_code'), 
+            'nama_cacat_golongan' =>  $request->getVar('nama_cacat_golongan'), 
+            'kode_cacat_golongan' =>  $request->getVar('kode_cacat_golongan'), 
+            'keterangan' =>  $request->getVar('keterangan'), 
+            'STATUS' =>  $request->getVar('STATUS'),  
+
+            'last_update_by' => $user->data->email, 
+            'last_update_date' => date('Y-m-d H:i:s'),
+        ]);
+    }
+
+     public static function softDelete($id, $model, $user){
+        return $model->update($id,[
+            'deleted_status' => 1,
+            'deleted_by' => $user->data->email,
+            'deleted_date' => date('Y-m-d H:i:s')
+        ]);
+    }
+
+    public function getAvailableId($model){
+        $result = $model->findAll();
+        if (count($result) > 0) {
+            return $result[count($result) - 1][$model->primaryKey] + 1;
+        } else {
+            return 1;
+        }
+
+    }
+
+
 }

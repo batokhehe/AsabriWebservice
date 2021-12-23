@@ -13,7 +13,7 @@ class BintangJasa extends BaseController
      *
      * @return mixed
      */
-    public function index()
+     public function index()
     {
         if (empty($this->user)) {
             $response = [
@@ -24,10 +24,8 @@ class BintangJasa extends BaseController
             ];
             return $this->respondCreated($response);
         }
-
-        $model = new BintangJasaModel();
       
-        $data = $model->where(['deleted_status' => 0])->findAll();
+        $data = BintangJasaModel::getAll();
       
         $response = [
             'status' => 200,
@@ -55,16 +53,14 @@ class BintangJasa extends BaseController
             return $this->respondCreated($response);
         }
 
-        $model = new BintangJasaModel();
-      
-        $data = $model->where([$model->primaryKey => $id])->where(['deleted_status' => 0])->first();
-      
-        if ($data) {
+        $result = BintangJasaModel::findById($id);
+
+        if ($result) {
             $response = [
                 'status' => 200,
                 'error' => null,
                 'messages' => $this->modulName . ' Found',
-                'data' => $data,
+                'data' => $result,
             ];
             return $this->respond($response);
         } else {
@@ -111,33 +107,18 @@ class BintangJasa extends BaseController
             return $this->respondCreated($response);
         }
 
-        $data = [
-            'bintang_jasa_unique_code' =>  $this->request->getVar('bintang_jasa_unique_code'), 
-            'nama_bintang_jasa' =>  $this->request->getVar('nama_bintang_jasa'), 
-            'kode_bintang_jasa' =>  $this->request->getVar('kode_bintang_jasa'), 
-            'deskripsi' =>  $this->request->getVar('deskripsi'), 
-            'is_aktif' =>  $this->request->getVar('is_aktif'),  
-            'is_add_tunjangan' =>  $this->request->getVar('is_add_tunjangan'),  
-            'tanggal_mulai' =>  $this->request->getVar('tanggal_mulai'),  
-            'tanggal_akhir' =>  $this->request->getVar('tanggal_akhir'),  
-            'kesatuan_id' =>  $this->request->getVar('kesatuan_id'),  
-            'nilai_tunjangan_bulanan' =>  $this->request->getVar('nilai_tunjangan_bulanan'), 
-            
-            'created_by' => $this->user->data->email, 
-            'created_date' => date('Y-m-d H:i:s'),
-            'deleted_status' =>  0, 
-        ];
-
-        if ($error = $model->insert($data) === FALSE) {
+        if ($model->createNew($model, $this->request, $this->user) === FALSE) {
             $response = [
                 'status' => 500,
                 'error' => true,
-                'messages' => $this->modulName . ' Gagal Tersimpan = ' . $error ];
+                'messages' => $this->modulName . ' Gagal Tersimpan',
+                'params' => $model->errors(),
+            ]; 
         } else {
             $response = [
                 'status' => 200,
                 'error' => null,
-                'messages' => $this->modulName . ' Berhasil Tersimpan' ];
+                'messages' => $this->modulName . ' Berhasil Tersimpan '];
         }
       
         return $this->respondCreated($response);
@@ -183,38 +164,21 @@ class BintangJasa extends BaseController
             return $this->respondCreated($response);
         }
 
-        $data = [
-            'bintang_jasa_unique_code' =>  $this->request->getVar('bintang_jasa_unique_code'), 
-            'nama_bintang_jasa' =>  $this->request->getVar('nama_bintang_jasa'), 
-            'kode_bintang_jasa' =>  $this->request->getVar('kode_bintang_jasa'), 
-            'deskripsi' =>  $this->request->getVar('deskripsi'), 
-            'is_aktif' =>  $this->request->getVar('is_aktif'),  
-            'is_add_tunjangan' =>  $this->request->getVar('is_add_tunjangan'),  
-            'tanggal_mulai' =>  $this->request->getVar('tanggal_mulai'),  
-            'tanggal_akhir' =>  $this->request->getVar('tanggal_akhir'),  
-            'kesatuan_id' =>  $this->request->getVar('kesatuan_id'),  
-            'nilai_tunjangan_bulanan' =>  $this->request->getVar('nilai_tunjangan_bulanan'), 
-            
-            'last_update_by' => $this->user->data->email, 
-            'last_update_date' => date('Y-m-d H:i:s'),
-        ];
-
-        if ($error = $model->update($id, $data)) {
-            $response = [
-                'status' => 200,
-                'error' => null,
-                'messages' => 'Data Updated'
-            ];
-        } else {
+        if ($model->updateData($id, $model, $this->request, $this->user) === FALSE) {
             $response = [
                 'status' => 500,
                 'error' => true,
-                'messages' => 'Data Failed to Updated'
-            ];
+                'messages' => $this->modulName . ' Gagal Tersimpan',
+                'params' => $model->errors(),
+            ]; 
+        } else {
+            $response = [
+                'status' => 200,
+                'error' => null,
+                'messages' => $this->modulName . ' Berhasil Tersimpan '];
         }
-
-       
-        return $this->respond($response);
+      
+        return $this->respondCreated($response);
     }
 
     /**
@@ -224,6 +188,7 @@ class BintangJasa extends BaseController
      */
     public function delete($id = null)
     {
+        $model = new BintangJasaModel();
         if (empty($this->user)) {
             $response = [
                 'status' => 401,
@@ -234,30 +199,31 @@ class BintangJasa extends BaseController
             return $this->respondCreated($response);
         }
 
-        $model = new BintangJasaModel();
+         // check availability
+        if ($model->findById($id) === FALSE){
+            return $this->respondCreated([
+                'status' => 404,
+                'error' => true,
+                'message' => 'Designated data to delete not found',
+                'data' => []
+            ]);
+        }
 
-        $data = $model->find($id);
+        $result = $model->softDelete($id, $model, $this->user);
 
-        if ($data) {
-
-            // $model->delete($id);
-
-            $data = [
-                'deleted_status' => 1, 
-                'deleted_by' => $this->user->data->email, 
-                'deleted_date' => date('Y-m-d H:i:s'),
+        if ($result === FALSE) {
+            $response = [
+                'status' => 500,
+                'error' => true,
+                'messages' => 'Data Failed to Deleted'
             ];
-
-        $model->update($id, $data);
-
+        } else {
             $response = [
                 'status' => 200,
                 'error' => null,
-                'messages' => 'Data Deleted',
+                'messages' => 'Data Deleted'
             ];
-            return $this->respondDeleted($response);
-        } else {
-            return $this->failNotFound('No Data Found with id ' . $id);
         }
+        return $this->respond($response);
     }
 }

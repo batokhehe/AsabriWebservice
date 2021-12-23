@@ -43,6 +43,7 @@ $routes->group('api', function ($routes) {
     $routes->resource('kelurahan');
     $routes->resource('unitOrganisasi');
     $routes->resource('kesatuan');
+    $routes->resource('kelompokPangkat');
     $routes->resource('pangkat');
     $routes->resource('pangkatKesatuan');
     $routes->resource('bintangJasa');

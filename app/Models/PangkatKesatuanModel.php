@@ -81,4 +81,60 @@ class PangkatKesatuanModel extends Model
     protected $afterFind      = [];
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
+
+     public static function getAll(){
+        $model = new PangkatKesatuanModel();
+        return $model->where(['deleted_status' => 0])->findAll();
+    }
+
+    public static function findById($id){
+        $model = new PangkatKesatuanModel();
+        return $model->where([$model->primaryKey => $id])->where(['deleted_status' => 0])->first();
+    }
+
+    public static function createNew($model, $request, $user){
+        return $model->insert([
+            $model->primaryKey => $model->getAvailableId($model),
+            'pangkat_kesatuan_unique_code' =>  $request->getVar('pangkat_kesatuan_unique_code'), 
+            'pangkat_id' =>  $request->getVar('pangkat_id'), 
+            'kesatuan_id' =>  $request->getVar('kesatuan_id'), 
+            'deskripsi' =>  $request->getVar('deskripsi'), 
+            'status' =>  $request->getVar('status'), 
+
+            'created_by' => $user->data->email, 
+            'created_date' => date('Y-m-d H:i:s'),
+            'deleted_status' =>  0, 
+        ]);
+    }
+
+    public static function updateData($id, $model, $request, $user){
+        return $model->update($id, [
+            'pangkat_kesatuan_unique_code' =>  $request->getVar('pangkat_kesatuan_unique_code'), 
+            'pangkat_id' =>  $request->getVar('pangkat_id'), 
+            'kesatuan_id' =>  $request->getVar('kesatuan_id'), 
+            'deskripsi' =>  $request->getVar('deskripsi'), 
+            'status' =>  $request->getVar('status'),  
+            
+            'last_update_by' => $user->data->email, 
+            'last_update_date' => date('Y-m-d H:i:s'),
+        ]);
+    }
+
+     public static function softDelete($id, $model, $user){
+        return $model->update($id,[
+            'deleted_status' => 1,
+            'deleted_by' => $user->data->email,
+            'deleted_date' => date('Y-m-d H:i:s')
+        ]);
+    }
+
+    public function getAvailableId($model){
+        $result = $model->findAll();
+        if (count($result) > 0) {
+            return $result[count($result) - 1][$model->primaryKey] + 1;
+        } else {
+            return 1;
+        }
+
+    }
 }
