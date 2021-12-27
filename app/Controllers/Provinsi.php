@@ -164,6 +164,15 @@ class Provinsi extends BaseController
             return $this->respondCreated($response);
         }
 
+        if (!$model->findById($id)){
+            return $this->respondCreated([
+                'status' => 404,
+                'error' => true,
+                'message' => 'Designated data to update not found',
+                'data' => []
+            ]);
+        }
+
         if ($model->updateData($id, $model, $this->request, $this->user) === FALSE) {
             $response = [
                 'status' => 500,

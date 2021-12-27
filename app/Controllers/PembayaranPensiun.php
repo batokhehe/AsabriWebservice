@@ -107,17 +107,18 @@ class PembayaranPensiun extends BaseController
             return $this->respondCreated($response);
         }
 
-        $result = PembayaranPensiunModel::createNew($this->request, $this->user);
-        if ($result === FALSE) {
+        if ($model->createNew($model, $this->request, $this->user) === FALSE) {
             $response = [
                 'status' => 500,
                 'error' => true,
-                'messages' => $this->modulName . ' Gagal Tersimpan = ' . $error ]; 
+                'messages' => $this->modulName . ' Gagal Tersimpan',
+                'params' => $model->errors(),
+            ]; 
         } else {
             $response = [
                 'status' => 200,
                 'error' => null,
-                'messages' => $this->modulName . ' Berhasil Tersimpan' ];
+                'messages' => $this->modulName . ' Berhasil Tersimpan '];
         }
       
         return $this->respondCreated($response);
@@ -163,21 +164,30 @@ class PembayaranPensiun extends BaseController
             return $this->respondCreated($response);
         }
 
-        $result = PembayaranPensiunModel::updateData($id, $this->request, $this->user);
-        if ($result === FALSE) {
+        if (!$model->findById($id)){
+            return $this->respondCreated([
+                'status' => 404,
+                'error' => true,
+                'message' => 'Designated data to update not found',
+                'data' => []
+            ]);
+        }
+
+        if ($model->updateData($id, $model, $this->request, $this->user) === FALSE) {
             $response = [
                 'status' => 500,
                 'error' => true,
-                'messages' => 'Data Failed to Updated'
-            ];
+                'messages' => $this->modulName . ' Gagal Tersimpan',
+                'params' => $model->errors(),
+            ]; 
         } else {
             $response = [
                 'status' => 200,
                 'error' => null,
-                'messages' => 'Data Updated'
-            ];
+                'messages' => $this->modulName . ' Berhasil Tersimpan '];
         }
-        return $this->respond($response);
+      
+        return $this->respondCreated($response);
     }
 
     /**
@@ -187,6 +197,7 @@ class PembayaranPensiun extends BaseController
      */
     public function delete($id = null)
     {
+        $model = new PembayaranPensiunModel();
         if (empty($this->user)) {
             $response = [
                 'status' => 401,
@@ -198,7 +209,7 @@ class PembayaranPensiun extends BaseController
         }
 
          // check availability
-        if (PembayaranPensiunModel::findById($id) === FALSE){
+        if ($model->findById($id) === FALSE){
             return $this->respondCreated([
                 'status' => 404,
                 'error' => true,
@@ -207,7 +218,7 @@ class PembayaranPensiun extends BaseController
             ]);
         }
 
-        $result = PembayaranPensiunModel::softDelete($id, $this->user);
+        $result = $model->softDelete($id, $model, $this->user);
 
         if ($result === FALSE) {
             $response = [

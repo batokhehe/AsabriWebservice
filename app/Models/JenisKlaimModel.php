@@ -97,7 +97,6 @@ class JenisKlaimModel extends Model
 
     public static function createNew($model, $request, $user){
         return $model->insert([
-            $model->primaryKey => $model->getAvailableId($model),
             'jenis_klaim_unique_code' => $request->getVar('jenis_klaim_unique_code'),
             'nama_jenis_klaim' => $request->getVar('nama_jenis_klaim'),
             'kode_jenis_klaim' => $request->getVar('kode_jenis_klaim'),

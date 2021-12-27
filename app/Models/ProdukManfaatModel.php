@@ -59,7 +59,6 @@ class ProdukManfaatModel extends Model
 
     // Validation
     protected $validationRules      = [
-        'produk_manfaat_id'=>'required',
         'produk_manfaat_unique_code'=>'required',
         'produk_id'=>'required',
         'produk_unique_code'=>'required',
@@ -111,10 +110,8 @@ class ProdukManfaatModel extends Model
         return $model->where([$model->primaryKey => $id])->where(['deleted_status'=> 0])->first();
     }
 
-    public static function createNew($request, $user){
-        $model = new ProdukManfaatModel();
+    public static function createNew($model, $request, $user){
         return $model->insert([
-            'produk_manfaat_id'=> $request->getVar('produk_manfaat_id'),
             'produk_manfaat_unique_code'=> $request->getVar('produk_manfaat_unique_code'),
             'produk_id'=> $request->getVar('produk_id'),
             'produk_unique_code'=> $request->getVar('produk_unique_code'),
@@ -146,10 +143,8 @@ class ProdukManfaatModel extends Model
         ]) ;
     }
 
-    public static function updateData($id, $request, $user){
-        $model = new ProdukManfaatModel();
+    public static function updateData($id, $model, $request, $user){
         return $model->update($id, [
-            'produk_manfaat_id'=> $request->getVar('produk_manfaat_id'),
             'produk_manfaat_unique_code'=> $request->getVar('produk_manfaat_unique_code'),
             'produk_id'=> $request->getVar('produk_id'),
             'produk_unique_code'=> $request->getVar('produk_unique_code'),
@@ -181,12 +176,21 @@ class ProdukManfaatModel extends Model
         ]);
     }
 
-    public static function softDelete($id, $user){
-        $model = new ProdukManfaatModel();
-        $model->update($id,[
-            'deleted_status'=> 1,
-            'deleted_by'=> $user->data->email,
-            'deleted_date'=> date('Y-m-d H:i:s')
+    public static function softDelete($id, $model, $user){
+        return $model->update($id,[
+            'deleted_status' => 1,
+            'deleted_by' => $user->data->email,
+            'deleted_date' => date('Y-m-d H:i:s')
         ]);
+    }
+
+    public function getAvailableId($model){
+        $result = $model->findAll();
+        if (count($result) > 0) {
+            return $result[count($result) - 1][$model->primaryKey] + 1;
+        } else {
+            return 1;
+        }
+
     }
 }

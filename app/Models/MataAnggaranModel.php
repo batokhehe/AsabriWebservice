@@ -17,7 +17,7 @@ class MataAnggaranModel extends Model
     protected $allowedFields    = [
         'mata_anggaran_id',
         'mata_anggaran_unique_code',
-        'nam_mata_anggaran',
+        'nama_mata_anggaran',
         'kode_mata_anggaran',
         'deskripsi',
         'created_by',
@@ -83,7 +83,6 @@ class MataAnggaranModel extends Model
 
     public static function createNew($model, $request, $user){
         return $model->insert([
-            $model->primaryKey => $model->getAvailableId($model),
             'mata_anggaran_unique_code' => $request->getVar('mata_anggaran_unique_code'),
             'nama_mata_anggaran' => $request->getVar('nama_mata_anggaran'),
             'kode_mata_anggaran' => $request->getVar('kode_mata_anggaran'),

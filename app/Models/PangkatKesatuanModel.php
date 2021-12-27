@@ -94,7 +94,6 @@ class PangkatKesatuanModel extends Model
 
     public static function createNew($model, $request, $user){
         return $model->insert([
-            $model->primaryKey => $model->getAvailableId($model),
             'pangkat_kesatuan_unique_code' =>  $request->getVar('pangkat_kesatuan_unique_code'), 
             'pangkat_id' =>  $request->getVar('pangkat_id'), 
             'kesatuan_id' =>  $request->getVar('kesatuan_id'), 

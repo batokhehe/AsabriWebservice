@@ -8,7 +8,7 @@ class FaskesModel extends Model
 {
     protected $DBGroup          ='default';
     protected $table            ='mst_faskes';
-    protected $primaryKey       ='peserta_manfaat_id';
+    protected $primaryKey       ='faskes_id';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
     protected $returnType       ='array';
@@ -70,7 +70,6 @@ class FaskesModel extends Model
 
     // Validation
     protected $validationRules      = [
-        'faskes_id'=>'required',
         'faskes_unique_code'=>'required',
         'nama_faskes'=>'required',
         'alamat'=>'required',
@@ -134,10 +133,9 @@ class FaskesModel extends Model
         return $model->where([$model->primaryKey => $id])->where(['deleted_status'=> 0])->first();
     }
 
-    public static function createNew($request, $user){
-        $model = new FaskesModel();
+    public static function createNew($model, $request, $user){
         return $model->insert([
-            'faskes_id'=> $request->getVar('faskes_id'),
+            $model->primaryKey => $model->getAvailableId($model),
             'faskes_unique_code'=> $request->getVar('faskes_unique_code'),
             'nama_faskes'=> $request->getVar('nama_faskes'),
             'alamat'=> $request->getVar('alamat'),
@@ -180,10 +178,8 @@ class FaskesModel extends Model
         ]) ;
     }
 
-    public static function updateData($id, $request, $user){
-        $model = new FaskesModel();
+     public static function updateData($id, $model, $request, $user){
         return $model->update($id, [
-            'faskes_id'=> $request->getVar('faskes_id'),
             'faskes_unique_code'=> $request->getVar('faskes_unique_code'),
             'nama_faskes'=> $request->getVar('nama_faskes'),
             'alamat'=> $request->getVar('alamat'),
@@ -225,12 +221,21 @@ class FaskesModel extends Model
         ]);
     }
 
-    public static function softDelete($id, $user){
-        $model = new FaskesModel();
-        $model->update($id,[
+    public static function softDelete($id, $model, $user){
+        return $model->update($id,[
             'deleted_status'=> 1,
             'deleted_by'=> $user->data->email,
             'deleted_date'=> date('Y-m-d H:i:s')
         ]);
+    }
+
+    public function getAvailableId($model){
+        $result = $model->findAll();
+        if (count($result) > 0) {
+            return $result[count($result) - 1][$model->primaryKey] + 1;
+        } else {
+            return 1;
+        }
+
     }
 }

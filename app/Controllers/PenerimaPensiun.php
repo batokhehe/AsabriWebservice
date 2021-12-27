@@ -107,17 +107,18 @@ class PenerimaPensiun extends BaseController
             return $this->respondCreated($response);
         }
 
-        $result = PenerimaPensiunModel::createNew($this->request, $this->user);
-        if ($result === FALSE) {
+        if ($model->createNew($model, $this->request, $this->user) === FALSE) {
             $response = [
                 'status' => 500,
                 'error' => true,
-                'messages' => $this->modulName . ' Gagal Tersimpan = ' . $error ]; 
+                'messages' => $this->modulName . ' Gagal Tersimpan',
+                'params' => $model->errors(),
+            ]; 
         } else {
             $response = [
                 'status' => 200,
                 'error' => null,
-                'messages' => $this->modulName . ' Berhasil Tersimpan' ];
+                'messages' => $this->modulName . ' Berhasil Tersimpan '];
         }
       
         return $this->respondCreated($response);
@@ -163,21 +164,21 @@ class PenerimaPensiun extends BaseController
             return $this->respondCreated($response);
         }
 
-        $result = PenerimaPensiunModel::updateData($id, $this->request, $this->user);
-        if ($result === FALSE) {
+        if ($model->updateData($id, $model, $this->request, $this->user) === FALSE) {
             $response = [
                 'status' => 500,
                 'error' => true,
-                'messages' => 'Data Failed to Updated'
-            ];
+                'messages' => $this->modulName . ' Gagal Tersimpan',
+                'params' => $model->errors(),
+            ]; 
         } else {
             $response = [
                 'status' => 200,
                 'error' => null,
-                'messages' => 'Data Updated'
-            ];
+                'messages' => $this->modulName . ' Berhasil Tersimpan '];
         }
-        return $this->respond($response);
+      
+        return $this->respondCreated($response);
     }
 
     /**
@@ -187,6 +188,7 @@ class PenerimaPensiun extends BaseController
      */
     public function delete($id = null)
     {
+        $model = new PenerimaPensiunModel();
         if (empty($this->user)) {
             $response = [
                 'status' => 401,
@@ -198,7 +200,7 @@ class PenerimaPensiun extends BaseController
         }
 
          // check availability
-        if (PenerimaPensiunModel::findById($id) === FALSE){
+        if ($model->findById($id) === FALSE){
             return $this->respondCreated([
                 'status' => 404,
                 'error' => true,
@@ -207,7 +209,7 @@ class PenerimaPensiun extends BaseController
             ]);
         }
 
-        $result = PenerimaPensiunModel::softDelete($id, $this->user);
+        $result = $model->softDelete($id, $model, $this->user);
 
         if ($result === FALSE) {
             $response = [

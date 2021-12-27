@@ -150,14 +150,14 @@ class KeluargaModel extends Model
         return $model->where([$model->primaryKey => $id])->where(['deleted_status' => 0])->first();
     }
 
-    public static function createNew($request, $user){
-        $model = new KeluargaModel();
+    public static function createNew($model, $request, $user){
         return $model->insert([
+            $model->primaryKey => $model->getAvailableId($model),
             'keluarga_unique_code' => $request->getVar('keluarga_unique_code'),
             'nama_keluarga' => $request->getVar('nama_keluarga'),
             'nomor_identitas_keluarga' => $request->getVar('nomor_identitas_keluarga'),
             'tempat_lahir' => $request->getVar('tempat_lahir'),
-            'tanggal_lahir' => $request->getVar('tanggal_lahir'),
+            'tanggal_lahir' => date('Y-m-d H:i:s', strtotime($request->getVar('tanggal_lahir'))),
             'status_peserta_id' => $request->getVar('status_peserta_id'),
             'nama_status_peserta' => $request->getVar('nama_status_peserta'),
             'alamat' => $request->getVar('alamat'),
@@ -172,9 +172,9 @@ class KeluargaModel extends Model
             'pekerjaan_id' => $request->getVar('pekerjaan_id'),
             'nama_pekerjaan' => $request->getVar('nama_pekerjaan'),
             'keterangan' => $request->getVar('keterangan'),
-            'tanggal_meninggal' => $request->getVar('tanggal_meninggal'),
-            'tanggal_bercerai' => $request->getVar('tanggal_bercerai'),
-            'tanggal_selesai_sekolah' => $request->getVar('tanggal_selesai_sekolah'),
+            'tanggal_meninggal' => date('Y-m-d H:i:s', strtotime($request->getVar('tanggal_meninggal'))),
+            'tanggal_bercerai' => date('Y-m-d H:i:s', strtotime($request->getVar('tanggal_bercerai'))),
+            'tanggal_selesai_sekolah' => date('Y-m-d H:i:s', strtotime($request->getVar('tanggal_selesai_sekolah'))),
             'kelurahan' => $request->getVar('kelurahan'),
             'kelurahan_id' => $request->getVar('kelurahan_id'),
             'kecamatan' => $request->getVar('kecamatan'),
@@ -194,7 +194,7 @@ class KeluargaModel extends Model
             'nomor_npwp' => $request->getVar('nomor_npwp'),
             'kode_jiwa' => $request->getVar('kode_jiwa'),
             'nrp_nip' => $request->getVar('nrp_nip'),
-            'tanggal_pernikahan' => $request->getVar('tanggal_pernikahan'),
+            'tanggal_pernikahan' => date('Y-m-d H:i:s', strtotime($request->getVar('tanggal_pernikahan'))),
             'nomor_akta_nikah' => $request->getVar('nomor_akta_nikah'),
             'nomor_akta_cerai' => $request->getVar('nomor_akta_cerai'),
             'nomor_akta_lahir' => $request->getVar('nomor_akta_lahir'),
@@ -205,14 +205,13 @@ class KeluargaModel extends Model
         ]) ;
     }
 
-    public static function updateData($id, $request, $user){
-        $model = new KeluargaModel();
+     public static function updateData($id, $model, $request, $user){
         return $model->update($id, [
             'keluarga_unique_code' => $request->getVar('keluarga_unique_code'),
             'nama_keluarga' => $request->getVar('nama_keluarga'),
             'nomor_identitas_keluarga' => $request->getVar('nomor_identitas_keluarga'),
             'tempat_lahir' => $request->getVar('tempat_lahir'),
-            'tanggal_lahir' => $request->getVar('tanggal_lahir'),
+            'tanggal_lahir' => date('Y-m-d H:i:s', strtotime($request->getVar('tanggal_lahir'))),
             'status_peserta_id' => $request->getVar('status_peserta_id'),
             'nama_status_peserta' => $request->getVar('nama_status_peserta'),
             'alamat' => $request->getVar('alamat'),
@@ -227,9 +226,9 @@ class KeluargaModel extends Model
             'pekerjaan_id' => $request->getVar('pekerjaan_id'),
             'nama_pekerjaan' => $request->getVar('nama_pekerjaan'),
             'keterangan' => $request->getVar('keterangan'),
-            'tanggal_meninggal' => $request->getVar('tanggal_meninggal'),
-            'tanggal_bercerai' => $request->getVar('tanggal_bercerai'),
-            'tanggal_selesai_sekolah' => $request->getVar('tanggal_selesai_sekolah'),
+            'tanggal_meninggal' => date('Y-m-d H:i:s', strtotime($request->getVar('tanggal_meninggal'))),
+            'tanggal_bercerai' => date('Y-m-d H:i:s', strtotime($request->getVar('tanggal_bercerai'))),
+            'tanggal_selesai_sekolah' => date('Y-m-d H:i:s', strtotime($request->getVar('tanggal_selesai_sekolah'))),
             'kelurahan' => $request->getVar('kelurahan'),
             'kelurahan_id' => $request->getVar('kelurahan_id'),
             'kecamatan' => $request->getVar('kecamatan'),
@@ -249,7 +248,7 @@ class KeluargaModel extends Model
             'nomor_npwp' => $request->getVar('nomor_npwp'),
             'kode_jiwa' => $request->getVar('kode_jiwa'),
             'nrp_nip' => $request->getVar('nrp_nip'),
-            'tanggal_pernikahan' => $request->getVar('tanggal_pernikahan'),
+            'tanggal_pernikahan' => date('Y-m-d H:i:s', strtotime($request->getVar('tanggal_pernikahan'))),
             'nomor_akta_nikah' => $request->getVar('nomor_akta_nikah'),
             'nomor_akta_cerai' => $request->getVar('nomor_akta_cerai'),
             'nomor_akta_lahir' => $request->getVar('nomor_akta_lahir'),
@@ -259,12 +258,21 @@ class KeluargaModel extends Model
         ]);
     }
 
-    public static function softDelete($id, $user){
-        $model = new KeluargaModel();
-        $model->update($id,[
+    public static function softDelete($id, $model, $user){
+        return $model->update($id,[
             'deleted_status' => 1,
             'deleted_by' => $user->data->email,
             'deleted_date' => date('Y-m-d H:i:s')
         ]);
+    }
+
+    public function getAvailableId($model){
+        $result = $model->findAll();
+        if (count($result) > 0) {
+            return $result[count($result) - 1][$model->primaryKey] + 1;
+        } else {
+            return 1;
+        }
+
     }
 }

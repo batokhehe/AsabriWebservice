@@ -9,179 +9,194 @@ class StatusPeserta extends BaseController
 {
     public $modulName = 'Status Peserta';
 
-    public function index()
+     public function index()
     {
-        if (empty($this->user)){
-            return $this->respondCreated([
+        if (empty($this->user)) {
+            $response = [
                 'status' => 401,
                 'error' => true,
                 'messages' => 'Access denied',
                 'data' => []
-            ]);
+            ];
+            return $this->respondCreated($response);
         }
-
+      
         $data = StatusPesertaModel::getAll();
-
-        return $this->respond([
+      
+        $response = [
             'status' => 200,
-            'error' => false,
-            'messages' => $this->modulName.'  Data '.count($data). ' Found',
-            '$data' => $data
-        ]);
+            'error' => null,
+            'messages' => $this->modulName . ' Data ' . count($data) . ' Found',
+            'data' => $data,
+        ];
+        return $this->respond($response);
     }
 
-    public function show($id = null){
-        if (empty($this->user)){
-            return $this->respondCreated([
+    /**
+     * Return the properties of a resource object
+     *
+     * @return mixed
+     */
+    public function show($id = null)
+    {
+        if (empty($this->user)) {
+            $response = [
                 'status' => 401,
                 'error' => true,
                 'messages' => 'Access denied',
                 'data' => []
-            ]);
+            ];
+            return $this->respondCreated($response);
         }
 
-        $data = StatusPesertaModel::findById($id);
-        if (!$data){
+        $result = StatusPesertaModel::findById($id);
+
+        if ($result) {
+            $response = [
+                'status' => 200,
+                'error' => null,
+                'messages' => $this->modulName . ' Found',
+                'data' => $result,
+            ];
+            return $this->respond($response);
+        } else {
             return $this->failNotFound('No ' . $this->modulName . ' Found with id ' . $id);
         }
-        return $this->respond([
-            'status' => 200,
-            'error' => null,
-            'messages' => $this->modulName . ' Found',
-            'data' => $data,
-        ]); 
     }
 
-    public function create(){
-        if (empty($this->user)){
-            return $this->respondCreated([
+    /**
+     * Return a new resource object, with default properties
+     *
+     * @return mixed
+     */
+    public function new()
+    {
+        //
+    }
+
+    /**
+     * Create a new resource object, from 'posted' parameters
+     *
+     * @return mixed
+     */
+    public function create()
+    {
+        if (empty($this->user)) {
+            $response = [
                 'status' => 401,
                 'error' => true,
                 'messages' => 'Access denied',
                 'data' => []
-            ]);
+            ];
+            return $this->respondCreated($response);
         }
 
-        $rules = [
-            'nama_status_peserta' => 'required', 
-            'kode_status_peserta' => 'required',
-            'status_peserta_unique_code' => 'required|is_unique[ref_status_peserta.status_peserta_unique_code]',
-            'keterangan' => 'required',
-        ];
+        $model = new StatusPesertaModel();
 
-        $messages = [
-            'nama_status_peserta' => [
-                'required' => 'Nama Status Peserta is required'
-            ],
-            'kode_status_peserta' => [
-                'required' => 'Kode Status Peserta is required',
-            ],
-            'status_peserta_unique_code' => [
-                'required' => 'Kode Unik Status Peserta is required'
-            ],
-            'keterangan' => [
-                'required' => 'Keterangan Status Peserta is required'
-            ]
-        ];
-
-        if (!$this->validate($rules, $messages)) {
-            return $this->respondCreated([
-                'status' => 400,
+        if (!$this->validate($model->validationRules, $model->validationMessages)) {
+            $response = [
+                'status' => 500,
                 'error' => true,
                 'message' => $this->validator->getErrors(),
                 'data' => []
-            ]);
+            ];
+            return $this->respondCreated($response);
         }
 
-        $jenisPeserta = StatusPesertaModel::createNew($this->request, $this->user);
-        if (!$jenisPeserta){
-            return $this->respondCreated([
-                    'status' => 500,
-                    'error' => true,
-                    'messages' => $this->modulName . ' Gagal Tersimpan = ' . $jenisPeserta 
-                ]);
+        if ($model->createNew($model, $this->request, $this->user) === FALSE) {
+            $response = [
+                'status' => 500,
+                'error' => true,
+                'messages' => $this->modulName . ' Gagal Tersimpan',
+                'params' => $model->errors(),
+            ]; 
+        } else {
+            $response = [
+                'status' => 200,
+                'error' => null,
+                'messages' => $this->modulName . ' Berhasil Tersimpan '];
         }
-        
-        return $this->respondCreated([
-            'status' => 200,
-            'error' => null,
-            'messages' => $this->modulName . ' Berhasil Tersimpan' 
-        ]);
+      
+        return $this->respondCreated($response);
     }
 
-    public function update($id = null){
-        if (empty($this->user)){
-            return $this->respondCreated([
+    /**
+     * Return the editable properties of a resource object
+     *
+     * @return mixed
+     */
+    public function edit($id = null)
+    {
+        //
+    }
+
+    /**
+     * Add or update a model resource, from 'posted' properties
+     *
+     * @return mixed
+     */
+    public function update($id = null)
+    {
+        if (empty($this->user)) {
+            $response = [
                 'status' => 401,
                 'error' => true,
                 'messages' => 'Access denied',
                 'data' => []
-            ]);
+            ];
+            return $this->respondCreated($response);
         }
 
-        $rules = [
-            'nama_status_peserta' => 'required', 
-            'kode_status_peserta' => 'required',
-            'status_peserta_unique_code' => 'required|is_unique[ref_status_peserta.status_peserta_unique_code]',
-            'keterangan' => 'required',
-        ];
+        $model = new StatusPesertaModel();
 
-        $messages = [
-            'nama_status_peserta' => [
-                'required' => 'Nama Status Peserta is required'
-            ],
-            'kode_status_peserta' => [
-                'required' => 'Kode Status Peserta is required',
-            ],
-            'status_peserta_unique_code' => [
-                'required' => 'Kode Unik Status Peserta is required'
-            ],
-            'keterangan' => [
-                'required' => 'Keterangan Status Peserta is required'
-            ]
-        ];
+        if (!$this->validate($model->validationRules, $model->validationMessages)) {
 
-        if (!$this->validate($rules, $messages)) {
-            return $this->respondCreated([
-                'status' => 400,
+            $response = [
+                'status' => 500,
                 'error' => true,
                 'message' => $this->validator->getErrors(),
                 'data' => []
-            ]);
+            ];
+            return $this->respondCreated($response);
         }
-        
-        // check availability
-        if (!StatusPesertaModel::findById($id)){
-            return $this->respondCreated([
-                'status' => 400,
+
+        if ($model->updateData($id, $model, $this->request, $this->user) === FALSE) {
+            $response = [
+                'status' => 500,
                 'error' => true,
-                'message' => 'Designated data to update not found',
-                'data' => []
-            ]);
+                'messages' => $this->modulName . ' Gagal Tersimpan',
+                'params' => $model->errors(),
+            ]; 
+        } else {
+            $response = [
+                'status' => 200,
+                'error' => null,
+                'messages' => $this->modulName . ' Berhasil Tersimpan '];
         }
-
-        // do update
-        StatusPesertaModel::updateData($id, $this->request, $this->user);
-
-        return $this->respondCreated($response = [
-            'status' => 200,
-            'error' => null,
-            'messages' => 'Data Updated'
-        ]);
+      
+        return $this->respondCreated($response);
     }
 
-    public function delete($id = null){
-        if (empty($this->user)){
-            return $this->respondCreated([
+    /**
+     * Delete the designated resource object from the model
+     *
+     * @return mixed
+     */
+    public function delete($id = null)
+    {
+        $model = new StatusPesertaModel();
+        if (empty($this->user)) {
+            $response = [
                 'status' => 401,
                 'error' => true,
                 'messages' => 'Access denied',
                 'data' => []
-            ]);
+            ];
+            return $this->respondCreated($response);
         }
 
-        // check availability
-        if (!StatusPesertaModel::findById($id)){
+         // check availability
+        if ($model->findById($id) === FALSE){
             return $this->respondCreated([
                 'status' => 404,
                 'error' => true,
@@ -190,12 +205,21 @@ class StatusPeserta extends BaseController
             ]);
         }
 
-        StatusPesertaModel::softDelete($id, $this->user);
+        $result = $model->softDelete($id, $model, $this->user);
 
-        return $this->respondDeleted([
-            'status' => 200,
-            'error' => null,
-            'messages' => 'Data Deleted',
-        ]);
+        if ($result === FALSE) {
+            $response = [
+                'status' => 500,
+                'error' => true,
+                'messages' => 'Data Failed to Deleted'
+            ];
+        } else {
+            $response = [
+                'status' => 200,
+                'error' => null,
+                'messages' => 'Data Deleted'
+            ];
+        }
+        return $this->respond($response);
     }
 }

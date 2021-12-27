@@ -66,7 +66,6 @@ class PenerimaPensiunModel extends Model
 
     // Validation
     protected $validationRules      = [
-        'penerima_pensiun_id'=> 'required',
         'penerima_pensiun_unique_code'=> 'required',
         'peserta_id'=> 'required',
         'peserta_unique_code'=> 'required',
@@ -87,13 +86,6 @@ class PenerimaPensiunModel extends Model
         'nama_rekening'=> 'required',
         'nama_bank'=> 'required',
         'nama_cabang_bank'=> 'required',
-        'created_by'=> 'required',
-        'created_date'=> 'required',
-        'last_update_by'=> 'required',
-        'last_update_date'=> 'required',
-        'deleted_status'=> 'required',
-        'deleted_by'=> 'required',
-        'deleted_date'=> 'required',
         'mitra_bayar_id'=> 'required',
         'nama_mitra_bayar'=> 'required',
         'mitra_bayar_unique_code'=> 'required',
@@ -132,10 +124,10 @@ class PenerimaPensiunModel extends Model
         return $model->where([$model->primaryKey => $id])->where(['deleted_status'=> 0])->first();
     }
 
-    public static function createNew($request, $user){
-        $model = new PenerimaPensiunModel();
+    
+    public static function createNew($model, $request, $user){
         return $model->insert([
-            'penerima_pensiun_id'=> $request->getVar('penerima_pensiun_id'),
+            $model->primaryKey => $model->getAvailableId($model),
             'penerima_pensiun_unique_code'=> $request->getVar('penerima_pensiun_unique_code'),
             'peserta_id'=> $request->getVar('peserta_id'),
             'peserta_unique_code'=> $request->getVar('peserta_unique_code'),
@@ -176,10 +168,8 @@ class PenerimaPensiunModel extends Model
         ]) ;
     }
 
-    public static function updateData($id, $request, $user){
-        $model = new PenerimaPensiunModel();
+    public static function updateData($id, $model, $request, $user){
         return $model->update($id, [
-            'penerima_pensiun_id'=> $request->getVar('penerima_pensiun_id'),
             'penerima_pensiun_unique_code'=> $request->getVar('penerima_pensiun_unique_code'),
             'peserta_id'=> $request->getVar('peserta_id'),
             'peserta_unique_code'=> $request->getVar('peserta_unique_code'),
@@ -218,12 +208,21 @@ class PenerimaPensiunModel extends Model
         ]);
     }
 
-    public static function softDelete($id, $user){
-        $model = new PenerimaPensiunModel();
-        $model->update($id,[
+    public static function softDelete($id, $model, $user){
+        return $model->update($id,[
             'deleted_status'=> 1,
             'deleted_by'=> $user->data->email,
             'deleted_date'=> date('Y-m-d H:i:s')
         ]);
+    }
+
+    public function getAvailableId($model){
+        $result = $model->findAll();
+        if (count($result) > 0) {
+            return $result[count($result) - 1][$model->primaryKey] + 1;
+        } else {
+            return 1;
+        }
+
     }
 }

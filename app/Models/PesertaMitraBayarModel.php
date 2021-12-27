@@ -48,7 +48,6 @@ class PesertaMitraBayarModel extends Model
 
     // Validation
     protected $validationRules      = [
-        'pensiun_mitra_bayar_id'=>'required',
         'pensiun_mitra_bayar_unique_code'=>'required',
         'penerima_pensiun_id'=>'required',
         'penerima_pensiun_unique_code'=>'required',
@@ -89,10 +88,9 @@ class PesertaMitraBayarModel extends Model
         return $model->where([$model->primaryKey => $id])->where(['deleted_status'=> 0])->first();
     }
 
-    public static function createNew($request, $user){
-        $model = new PesertaMitraBayarModel();
+    public static function createNew($model, $request, $user){
         return $model->insert([
-            'pensiun_mitra_bayar_id'=> $request->getVar('pensiun_mitra_bayar_id'),
+            $model->primaryKey => $model->getAvailableId($model),
             'pensiun_mitra_bayar_unique_code'=> $request->getVar('pensiun_mitra_bayar_unique_code'),
             'penerima_pensiun_id'=> $request->getVar('penerima_pensiun_id'),
             'penerima_pensiun_unique_code'=> $request->getVar('penerima_pensiun_unique_code'),
@@ -113,10 +111,8 @@ class PesertaMitraBayarModel extends Model
         ]) ;
     }
 
-    public static function updateData($id, $request, $user){
-        $model = new PesertaMitraBayarModel();
+    public static function updateData($id, $model, $request, $user){
         return $model->update($id, [
-            'pensiun_mitra_bayar_id'=> $request->getVar('pensiun_mitra_bayar_id'),
             'pensiun_mitra_bayar_unique_code'=> $request->getVar('pensiun_mitra_bayar_unique_code'),
             'penerima_pensiun_id'=> $request->getVar('penerima_pensiun_id'),
             'penerima_pensiun_unique_code'=> $request->getVar('penerima_pensiun_unique_code'),
@@ -136,12 +132,21 @@ class PesertaMitraBayarModel extends Model
         ]);
     }
 
-    public static function softDelete($id, $user){
-        $model = new PesertaMitraBayarModel();
-        $model->update($id,[
+    public static function softDelete($id, $model, $user){
+        return $model->update($id,[
             'deleted_status'=> 1,
             'deleted_by'=> $user->data->email,
             'deleted_date'=> date('Y-m-d H:i:s')
         ]);
+    }
+
+    public function getAvailableId($model){
+        $result = $model->findAll();
+        if (count($result) > 0) {
+            return $result[count($result) - 1][$model->primaryKey] + 1;
+        } else {
+            return 1;
+        }
+
     }
 }

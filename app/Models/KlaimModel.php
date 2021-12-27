@@ -81,7 +81,6 @@ class KlaimModel extends Model
 
     // Validation
     protected $validationRules      = [
-        'klaim_id'=>'required',
         'klaim_unique_code'=>'required',
         'nomor_klaim'=>'required',
         'tanggal_klaim'=>'required',
@@ -155,10 +154,8 @@ class KlaimModel extends Model
         return $model->where([$model->primaryKey => $id])->where(['deleted_status'=> 0])->first();
     }
 
-    public static function createNew($request, $user){
-        $model = new KlaimModel();
+    public static function createNew($model, $request, $user){
         return $model->insert([
-            'klaim_id'=> $request->getVar('klaim_id'),
             'klaim_unique_code'=> $request->getVar('klaim_unique_code'),
             'nomor_klaim'=> $request->getVar('nomor_klaim'),
             'tanggal_klaim'=> $request->getVar('tanggal_klaim'),
@@ -214,10 +211,8 @@ class KlaimModel extends Model
         ]) ;
     }
 
-    public static function updateData($id, $request, $user){
-        $model = new KlaimModel();
+    public static function updateData($id, $model, $request, $user){
         return $model->update($id, [
-            'klaim_id'=> $request->getVar('klaim_id'),
             'klaim_unique_code'=> $request->getVar('klaim_unique_code'),
             'nomor_klaim'=> $request->getVar('nomor_klaim'),
             'tanggal_klaim'=> $request->getVar('tanggal_klaim'),
@@ -271,12 +266,21 @@ class KlaimModel extends Model
         ]);
     }
 
-    public static function softDelete($id, $user){
-        $model = new KlaimModel();
-        $model->update($id,[
+    public static function softDelete($id, $model, $user){
+        return $model->update($id,[
             'deleted_status'=> 1,
             'deleted_by'=> $user->data->email,
             'deleted_date'=> date('Y-m-d H:i:s')
         ]);
+    }
+
+    public function getAvailableId($model){
+        $result = $model->findAll();
+        if (count($result) > 0) {
+            return $result[count($result) - 1][$model->primaryKey] + 1;
+        } else {
+            return 1;
+        }
+
     }
 }

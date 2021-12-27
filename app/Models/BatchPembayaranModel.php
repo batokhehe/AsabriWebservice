@@ -54,7 +54,6 @@ class BatchPembayaranModel extends Model
 
     // Validation
     protected $validationRules      = [
-        'batch_pembayaran_id'=>'required',
         'batch_pembayaran_unique_code'=>'required',
         'nomor_batch_pembayaran'=>'required',
         'bulan_tahun'=>'required',
@@ -101,10 +100,8 @@ class BatchPembayaranModel extends Model
         return $model->where([$model->primaryKey => $id])->where(['deleted_status'=> 0])->first();
     }
 
-    public static function createNew($request, $user){
-        $model = new BatchPembayaranModel();
+    public static function createNew($model, $request, $user){
         return $model->insert([
-            'batch_pembayaran_id'=> $request->getVar('batch_pembayaran_id'),
             'batch_pembayaran_unique_code'=> $request->getVar('batch_pembayaran_unique_code'),
             'nomor_batch_pembayaran'=> $request->getVar('nomor_batch_pembayaran'),
             'bulan_tahun'=> $request->getVar('bulan_tahun'),
@@ -113,13 +110,6 @@ class BatchPembayaranModel extends Model
             'status_pembayaran'=> $request->getVar('status_pembayaran'),
             'nama_status_pembayaran'=> $request->getVar('nama_status_pembayaran'),
             'deskripsi'=> $request->getVar('deskripsi'),
-            'created_date'=> $request->getVar('created_date'),
-            'created_by'=> $request->getVar('created_by'),
-            'last_update_date'=> $request->getVar('last_update_date'),
-            'last_update_by'=> $request->getVar('last_update_by'),
-            'deleted_status'=> $request->getVar('deleted_status'),
-            'deleted_by'=> $request->getVar('deleted_by'),
-            'deleted_date'=> $request->getVar('deleted_date'),
             'jumlah_pembayaran'=> $request->getVar('jumlah_pembayaran'),
             'jumlah_potongan'=> $request->getVar('jumlah_potongan'),
             'jumlah_penerima'=> $request->getVar('jumlah_penerima'),
@@ -138,10 +128,8 @@ class BatchPembayaranModel extends Model
         ]) ;
     }
 
-    public static function updateData($id, $request, $user){
-        $model = new BatchPembayaranModel();
+    public static function updateData($id, $model, $request, $user){
         return $model->update($id, [
-            'batch_pembayaran_id'=> $request->getVar('batch_pembayaran_id'),
             'batch_pembayaran_unique_code'=> $request->getVar('batch_pembayaran_unique_code'),
             'nomor_batch_pembayaran'=> $request->getVar('nomor_batch_pembayaran'),
             'bulan_tahun'=> $request->getVar('bulan_tahun'),
@@ -150,13 +138,6 @@ class BatchPembayaranModel extends Model
             'status_pembayaran'=> $request->getVar('status_pembayaran'),
             'nama_status_pembayaran'=> $request->getVar('nama_status_pembayaran'),
             'deskripsi'=> $request->getVar('deskripsi'),
-            'created_date'=> $request->getVar('created_date'),
-            'created_by'=> $request->getVar('created_by'),
-            'last_update_date'=> $request->getVar('last_update_date'),
-            'last_update_by'=> $request->getVar('last_update_by'),
-            'deleted_status'=> $request->getVar('deleted_status'),
-            'deleted_by'=> $request->getVar('deleted_by'),
-            'deleted_date'=> $request->getVar('deleted_date'),
             'jumlah_pembayaran'=> $request->getVar('jumlah_pembayaran'),
             'jumlah_potongan'=> $request->getVar('jumlah_potongan'),
             'jumlah_penerima'=> $request->getVar('jumlah_penerima'),
@@ -174,12 +155,21 @@ class BatchPembayaranModel extends Model
         ]);
     }
 
-    public static function softDelete($id, $user){
-        $model = new BatchPembayaranModel();
-        $model->update($id,[
-            'deleted_status'=> 1,
-            'deleted_by'=> $user->data->email,
-            'deleted_date'=> date('Y-m-d H:i:s')
+    public static function softDelete($id, $model, $user){
+        return $model->update($id,[
+            'deleted_status' => 1,
+            'deleted_by' => $user->data->email,
+            'deleted_date' => date('Y-m-d H:i:s')
         ]);
+    }
+
+    public function getAvailableId($model){
+        $result = $model->findAll();
+        if (count($result) > 0) {
+            return $result[count($result) - 1][$model->primaryKey] + 1;
+        } else {
+            return 1;
+        }
+
     }
 }

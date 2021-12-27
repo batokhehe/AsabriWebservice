@@ -1,19 +1,19 @@
 <?php
 
 namespace App\Controllers;
-use App\Models\ProdukModel;
+use App\Models\GolonganPangkatModel;
 
-class Produk extends BaseController
+class GolonganPangkat extends BaseController
 {
 
-    public $modulName = 'Produk';
+    public $modulName = 'Golongan Pangkat';
 
    /**
      * Return an array of resource objects, themselves in array format
      *
      * @return mixed
      */
-     public function index()
+    public function index()
     {
         if (empty($this->user)) {
             $response = [
@@ -25,7 +25,7 @@ class Produk extends BaseController
             return $this->respondCreated($response);
         }
       
-        $data = ProdukModel::getAll();
+        $data = GolonganPangkatModel::getAll();
       
         $response = [
             'status' => 200,
@@ -53,7 +53,7 @@ class Produk extends BaseController
             return $this->respondCreated($response);
         }
 
-        $result = ProdukModel::findById($id);
+        $result = GolonganPangkatModel::findById($id);
 
         if ($result) {
             $response = [
@@ -95,7 +95,7 @@ class Produk extends BaseController
             return $this->respondCreated($response);
         }
 
-        $model = new ProdukModel();
+        $model = new GolonganPangkatModel();
 
         if (!$this->validate($model->validationRules, $model->validationMessages)) {
             $response = [
@@ -151,7 +151,7 @@ class Produk extends BaseController
             return $this->respondCreated($response);
         }
 
-        $model = new ProdukModel();
+        $model = new GolonganPangkatModel();
 
         if (!$this->validate($model->validationRules, $model->validationMessages)) {
 
@@ -188,7 +188,7 @@ class Produk extends BaseController
      */
     public function delete($id = null)
     {
-        $model = new ProdukModel();
+        $model = new GolonganPangkatModel();
         if (empty($this->user)) {
             $response = [
                 'status' => 401,

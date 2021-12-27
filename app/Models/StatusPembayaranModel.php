@@ -4,33 +4,29 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class LaporSptbModel extends Model
+class StatusPembayaranModel extends Model
 {
     protected $DBGroup          ='default';
-    protected $table            ='trx_lapor_sptb';
-    protected $primaryKey       ='lapor_sptb_id';
+    protected $table            ='ref_status_pembayaran';
+    protected $primaryKey       ='status_pembayaran_id';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
     protected $returnType       ='array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
-        'lapor_sptb_id',
-        'lapor_sptb_unique_code',
-        'tanggal_lapor_sptb',
-        'penerima_pensiun_id',
-        'nama_penerima_pensiun',
-        'penerima_pensiun_unique_code',
-        'status',
+        'status_pembayaran_id',
+        'nama_status_pembayaran',
+        'kode_status_pembayaran',
+        'status_pembayaran_unique_code',
         'keterangan',
         'created_date',
         'created_by',
         'last_update_date',
         'last_update_by',
-        'deleted_status',
-        'deleted_by',
         'deleted_date',
-
+        'deleted_by',
+        'deleted_status',
 
     ];
 
@@ -43,14 +39,10 @@ class LaporSptbModel extends Model
 
     // Validation
     protected $validationRules      = [
-        'lapor_sptb_unique_code'=>'required',
-        'tanggal_lapor_sptb'=>'required',
-        'penerima_pensiun_id'=>'required',
-        'nama_penerima_pensiun'=>'required',
-        'penerima_pensiun_unique_code'=>'required',
-        'status'=>'required',
+        'nama_status_pembayaran'=>'required',
+        'kode_status_pembayaran'=>'required',
+        'status_pembayaran_unique_code'=>'required',
         'keterangan'=>'required',
-
 
     ];
     protected $validationMessages   = [];
@@ -69,52 +61,47 @@ class LaporSptbModel extends Model
     protected $afterDelete    = [];
 
     public static function getAll(){
-        $model = new LaporSptbModel();
+        $model = new StatusPembayaranModel();
         return $model->where(['deleted_status'=> 0])->findAll();
     }
 
     public static function findById($id){
-        $model = new LaporSptbModel();
+        $model = new StatusPembayaranModel();
         return $model->where([$model->primaryKey => $id])->where(['deleted_status'=> 0])->first();
     }
 
     public static function createNew($model, $request, $user){
         return $model->insert([
             $model->primaryKey => $model->getAvailableId($model),
-            'lapor_sptb_unique_code'=> $request->getVar('lapor_sptb_unique_code'),
-            'tanggal_lapor_sptb'=> $request->getVar('tanggal_lapor_sptb'),
-            'penerima_pensiun_id'=> $request->getVar('penerima_pensiun_id'),
-            'nama_penerima_pensiun'=> $request->getVar('nama_penerima_pensiun'),
-            'penerima_pensiun_unique_code'=> $request->getVar('penerima_pensiun_unique_code'),
-            'status'=> $request->getVar('status'),
-            'keterangan'=> $request->getVar('keterangan'),
+           'nama_status_pembayaran'=> $request->getVar('nama_status_pembayaran'),
+           'kode_status_pembayaran'=> $request->getVar('kode_status_pembayaran'),
+           'status_pembayaran_unique_code'=> $request->getVar('status_pembayaran_unique_code'),
+           'keterangan'=> $request->getVar('keterangan'),
 
-            'created_date'=> date('Y-m-d H:i:s'),
-            'created_by'=> $user->data->email,
-            'deleted_status'=>  0, 
-        ]) ;
+
+           'created_by'=> $user->data->email, 
+           'created_date'=> date('Y-m-d H:i:s'),
+           'deleted_status'=>  0, 
+        ]);
     }
 
     public static function updateData($id, $model, $request, $user){
         return $model->update($id, [
-            'lapor_sptb_unique_code'=> $request->getVar('lapor_sptb_unique_code'),
-            'tanggal_lapor_sptb'=> $request->getVar('tanggal_lapor_sptb'),
-            'penerima_pensiun_id'=> $request->getVar('penerima_pensiun_id'),
-            'nama_penerima_pensiun'=> $request->getVar('nama_penerima_pensiun'),
-            'penerima_pensiun_unique_code'=> $request->getVar('penerima_pensiun_unique_code'),
-            'status'=> $request->getVar('status'),
-            'keterangan'=> $request->getVar('keterangan'),
+           'nama_status_pembayaran'=> $request->getVar('nama_status_pembayaran'),
+           'kode_status_pembayaran'=> $request->getVar('kode_status_pembayaran'),
+           'status_pembayaran_unique_code'=> $request->getVar('status_pembayaran_unique_code'),
+           'keterangan'=> $request->getVar('keterangan'),
 
-            'last_update_by'=> $user->data->email, 
-            'last_update_date'=> date('Y-m-d H:i:s'),
+           'last_update_by'=> $user->data->email, 
+           'last_update_date'=> date('Y-m-d H:i:s'),
         ]);
     }
 
     public static function softDelete($id, $model, $user){
         return $model->update($id,[
-            'deleted_status' => 1,
-            'deleted_by' => $user->data->email,
-            'deleted_date' => date('Y-m-d H:i:s')
+           'deleted_status'=> 1,
+           'deleted_by'=> $user->data->email,
+           'deleted_date'=> date('Y-m-d H:i:s')
         ]);
     }
 

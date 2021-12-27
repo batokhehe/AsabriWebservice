@@ -254,7 +254,7 @@ class PesertaModel extends Model
 
     public static function createNew($model, $request, $user){
         return $model->insert([
-            'peserta_id'=> $request->getVar('peserta_id'),
+            $model->primaryKey => $model->getAvailableId($model),
             'peserta_unique_code'=> $request->getVar('peserta_unique_code'),
             'nama_peserta'=> $request->getVar('nama_peserta'),
             'nomor_identitas_peserta'=> $request->getVar('nomor_identitas_peserta'),
@@ -324,8 +324,8 @@ class PesertaModel extends Model
             'golongan_pangkat_id'=> $request->getVar('golongan_pangkat_id'),
             'nama_golongan_pangkat'=> $request->getVar('nama_golongan_pangkat'),
             'user_id'=> $request->getVar('user_id'),
-            'peserta_date_end'=> $request->getVar('peserta_date_end'),
-            'peserta_skep_date_end'=> $request->getVar('peserta_skep_date_end'),
+            'peserta_date_end'=> date('Y-m-d H:i:s', strtotime($request->getVar('peserta_date_end'))),
+            'peserta_skep_date_end'=> date('Y-m-d H:i:s', strtotime($request->getVar('peserta_skep_date_end'))),
             'nomor_skep_end'=> $request->getVar('nomor_skep_end'),
             'tanggal_skep_alih'=> date('Y-m-d H:i:s', strtotime($request->getVar('tanggal_skep_alih'))),
             'satuan_kerja'=> $request->getVar('satuan_kerja'),
@@ -358,9 +358,8 @@ class PesertaModel extends Model
         ]) ;
 
     }
-
-    public static function updateData($id, $request, $user){
-        $model = new PesertaModel();
+    
+    public static function updateData($id, $model, $request, $user){
         return $model->update($id, [
             'peserta_unique_code'=> $request->getVar('peserta_unique_code'),
             'nama_peserta'=> $request->getVar('nama_peserta'),
@@ -471,5 +470,15 @@ class PesertaModel extends Model
             'deleted_by' => $user->data->email,
             'deleted_date' => date('Y-m-d H:i:s')
         ]);
+    }
+
+    public function getAvailableId($model){
+        $result = $model->findAll();
+        if (count($result) > 0) {
+            return $result[count($result) - 1][$model->primaryKey] + 1;
+        } else {
+            return 1;
+        }
+
     }
 }

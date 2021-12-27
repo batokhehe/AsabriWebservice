@@ -51,7 +51,6 @@ class PesertaPangkatModel extends Model
 
     // Validation
     protected $validationRules      = [
-        'peserta_pangkat_id'=>'required',
         'peserta_pangkat_unique_code'=>'required',
         'no_surat_keputusan_pangkat'=>'required',
         'peserta_id'=>'required',
@@ -68,13 +67,6 @@ class PesertaPangkatModel extends Model
         'jumlah_santunan'=>'required',
         'jumlah_tunjangan'=>'required',
         'keterangan'=>'required',
-        'created_by'=>'required',
-        'created_date'=>'required',
-        'last_update_by'=>'required',
-        'last_update_date'=>'required',
-        'deleted_status'=>'required',
-        'deleted_by'=>'required',
-        'deleted_date'=>'required',
         'gaji_pokok'=>'required',
     ];
     protected $validationMessages   = [];
@@ -102,10 +94,8 @@ class PesertaPangkatModel extends Model
         return $model->where([$model->primaryKey => $id])->where(['deleted_status'=> 0])->first();
     }
 
-    public static function createNew($request, $user){
-        $model = new PesertaPangkatModel();
+    public static function createNew($model, $request, $user){
         return $model->insert([
-            'peserta_pangkat_id'=> $request->getVar('peserta_pangkat_id'),
             'peserta_pangkat_unique_code'=> $request->getVar('peserta_pangkat_unique_code'),
             'no_surat_keputusan_pangkat'=> $request->getVar('no_surat_keputusan_pangkat'),
             'peserta_id'=> $request->getVar('peserta_id'),
@@ -122,13 +112,6 @@ class PesertaPangkatModel extends Model
             'jumlah_santunan'=> $request->getVar('jumlah_santunan'),
             'jumlah_tunjangan'=> $request->getVar('jumlah_tunjangan'),
             'keterangan'=> $request->getVar('keterangan'),
-            'created_by'=> $request->getVar('created_by'),
-            'created_date'=> $request->getVar('created_date'),
-            'last_update_by'=> $request->getVar('last_update_by'),
-            'last_update_date'=> $request->getVar('last_update_date'),
-            'deleted_status'=> $request->getVar('deleted_status'),
-            'deleted_by'=> $request->getVar('deleted_by'),
-            'deleted_date'=> $request->getVar('deleted_date'),
             'gaji_pokok'=> $request->getVar('gaji_pokok'),
 
             'created_date'=> date('Y-m-d H:i:s'),
@@ -137,10 +120,8 @@ class PesertaPangkatModel extends Model
         ]) ;
     }
 
-    public static function updateData($id, $request, $user){
-        $model = new PesertaPangkatModel();
+    public static function updateData($id, $model, $request, $user){
         return $model->update($id, [
-        'peserta_pangkat_id'=> $request->getVar('peserta_pangkat_id'),
             'peserta_pangkat_unique_code'=> $request->getVar('peserta_pangkat_unique_code'),
             'no_surat_keputusan_pangkat'=> $request->getVar('no_surat_keputusan_pangkat'),
             'peserta_id'=> $request->getVar('peserta_id'),
@@ -157,13 +138,6 @@ class PesertaPangkatModel extends Model
             'jumlah_santunan'=> $request->getVar('jumlah_santunan'),
             'jumlah_tunjangan'=> $request->getVar('jumlah_tunjangan'),
             'keterangan'=> $request->getVar('keterangan'),
-            'created_by'=> $request->getVar('created_by'),
-            'created_date'=> $request->getVar('created_date'),
-            'last_update_by'=> $request->getVar('last_update_by'),
-            'last_update_date'=> $request->getVar('last_update_date'),
-            'deleted_status'=> $request->getVar('deleted_status'),
-            'deleted_by'=> $request->getVar('deleted_by'),
-            'deleted_date'=> $request->getVar('deleted_date'),
             'gaji_pokok'=> $request->getVar('gaji_pokok'),
 
             'last_update_by'=> $user->data->email, 
@@ -171,12 +145,21 @@ class PesertaPangkatModel extends Model
         ]);
     }
 
-    public static function softDelete($id, $user){
-        $model = new PesertaPangkatModel();
-        $model->update($id,[
+    public static function softDelete($id, $model, $user){
+        return $model->update($id,[
             'deleted_status'=> 1,
             'deleted_by'=> $user->data->email,
             'deleted_date'=> date('Y-m-d H:i:s')
         ]);
+    }
+
+    public function getAvailableId($model){
+        $result = $model->findAll();
+        if (count($result) > 0) {
+            return $result[count($result) - 1][$model->primaryKey] + 1;
+        } else {
+            return 1;
+        }
+
     }
 }

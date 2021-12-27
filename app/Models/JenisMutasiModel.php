@@ -17,7 +17,7 @@ class JenisMutasiModel extends Model
     protected $allowedFields    = [
         'jenis_mutasi_id',
         'jenis_mutasi_unique_code',
-        'nam_jenis_mutasi',
+        'nama_jenis_mutasi',
         'kode_jenis_mutasi',
         'deskripsi',
         'created_by',
@@ -83,7 +83,6 @@ class JenisMutasiModel extends Model
 
     public static function createNew($model, $request, $user){
         return $model->insert([
-            $model->primaryKey => $model->getAvailableId($model),
             'jenis_mutasi_unique_code' => $request->getVar('jenis_mutasi_unique_code'),
             'nama_jenis_mutasi' => $request->getVar('nama_jenis_mutasi'),
             'kode_jenis_mutasi' => $request->getVar('kode_jenis_mutasi'),

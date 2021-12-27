@@ -17,7 +17,7 @@ class TipeDokumenModel extends Model
     protected $allowedFields    = [
         'tipe_dokumen_id',
         'tipe_dokumen_unique_code',
-        'nam_tipe_dokumen',
+        'nama_tipe_dokumen',
         'kode_tipe_dokumen',
         'deskripsi',
         'status',
@@ -38,8 +38,30 @@ class TipeDokumenModel extends Model
     protected $deletedField  = 'deleted_date';
 
     // Validation
-    protected $validationRules      = [];
-    protected $validationMessages   = [];
+    protected $validationRules      = [
+        'nama_tipe_dokumen' => 'required', 
+        'kode_tipe_dokumen' => 'required',
+        'tipe_dokumen_unique_code' => 'required|is_unique[ref_tipe_dokumen.tipe_dokumen_unique_code]',
+        'deskripsi' => 'required',
+        'status' => 'required'
+    ];
+    protected $validationMessages   = [
+        'nama_tipe_dokumen' => [
+            'required' => 'Nama Tipe Dokumen is required'
+        ],
+        'kode_tipe_dokumen' => [
+            'required' => 'Kode Tipe Dokumen is required',
+        ],
+        'tipe_dokumen_unique_code' => [
+            'required' => 'Kode Unik Tipe Dokumen is required'
+        ],
+        'deskripsi' => [
+            'required' => 'Deskripsi Tipe Dokumen is required'
+        ],
+        'status' => [
+            'required' => 'Status Tipe Dokumen is required'
+        ]
+    ];
     protected $skipValidation       = false;
     protected $cleanValidationRules = true;
 
@@ -64,36 +86,49 @@ class TipeDokumenModel extends Model
         return $model->where([$model->primaryKey => $id])->where(['deleted_status' => 0])->first();
     }
 
-    public static function createNew($request, $user){
-        $model = new TipeDokumenModel();
+    public static function createNew($model, $request, $user){
         return $model->insert([
+            $model->primaryKey => $model->getAvailableId($model),
             'tipe_dokumen_unique_code' => $request->getVar('tipe_dokumen_unique_code'),
             'nama_tipe_dokumen' => $request->getVar('nama_tipe_dokumen'),
             'kode_tipe_dokumen' => $request->getVar('kode_tipe_dokumen'),
             'deskripsi' => $request->getVar('deskripsi'),
             'status' => $request->getVar('status'),
-            'created_by' => $user->data->email,
-        ]) ;
+
+            'created_by' => $user->data->email, 
+            'created_date' => date('Y-m-d H:i:s'),
+            'deleted_status' =>  0, 
+        ]);
     }
 
-    public static function updateData($id, $request, $user){
-        $model = new TipeDokumenModel();
+    public static function updateData($id, $model, $request, $user){
         return $model->update($id, [
             'tipe_dokumen_unique_code' => $request->getVar('tipe_dokumen_unique_code'),
             'nama_tipe_dokumen' => $request->getVar('nama_tipe_dokumen'),
             'kode_tipe_dokumen' => $request->getVar('kode_tipe_dokumen'),
             'deskripsi' => $request->getVar('deskripsi'),
             'status' => $request->getVar('status'),
-            'updated_by' => $user->data->email,
+            
+            'last_update_by' => $user->data->email, 
+            'last_update_date' => date('Y-m-d H:i:s'),
         ]);
     }
 
-    public static function softDelete($id, $user){
-        $model = new TipeDokumenModel();
-        $model->update($id,[
+     public static function softDelete($id, $model, $user){
+        return $model->update($id,[
             'deleted_status' => 1,
             'deleted_by' => $user->data->email,
             'deleted_date' => date('Y-m-d H:i:s')
         ]);
+    }
+
+    public function getAvailableId($model){
+        $result = $model->findAll();
+        if (count($result) > 0) {
+            return $result[count($result) - 1][$model->primaryKey] + 1;
+        } else {
+            return 1;
+        }
+
     }
 }

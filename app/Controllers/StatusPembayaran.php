@@ -1,19 +1,19 @@
 <?php
 
 namespace App\Controllers;
-use App\Models\ProdukModel;
+use App\Models\StatusPembayaranModel;
 
-class Produk extends BaseController
+class StatusPembayaran extends BaseController
 {
 
-    public $modulName = 'Produk';
+    public $modulName = 'Status Pembayaran';
 
    /**
      * Return an array of resource objects, themselves in array format
      *
      * @return mixed
      */
-     public function index()
+    public function index()
     {
         if (empty($this->user)) {
             $response = [
@@ -25,7 +25,7 @@ class Produk extends BaseController
             return $this->respondCreated($response);
         }
       
-        $data = ProdukModel::getAll();
+        $data = StatusPembayaranModel::getAll();
       
         $response = [
             'status' => 200,
@@ -53,7 +53,7 @@ class Produk extends BaseController
             return $this->respondCreated($response);
         }
 
-        $result = ProdukModel::findById($id);
+        $result = StatusPembayaranModel::findById($id);
 
         if ($result) {
             $response = [
@@ -95,7 +95,7 @@ class Produk extends BaseController
             return $this->respondCreated($response);
         }
 
-        $model = new ProdukModel();
+        $model = new StatusPembayaranModel();
 
         if (!$this->validate($model->validationRules, $model->validationMessages)) {
             $response = [
@@ -151,7 +151,7 @@ class Produk extends BaseController
             return $this->respondCreated($response);
         }
 
-        $model = new ProdukModel();
+        $model = new StatusPembayaranModel();
 
         if (!$this->validate($model->validationRules, $model->validationMessages)) {
 
@@ -162,6 +162,15 @@ class Produk extends BaseController
                 'data' => []
             ];
             return $this->respondCreated($response);
+        }
+
+        if (!$model->findById($id)){
+            return $this->respondCreated([
+                'status' => 404,
+                'error' => true,
+                'message' => 'Designated data to update not found',
+                'data' => []
+            ]);
         }
 
         if ($model->updateData($id, $model, $this->request, $this->user) === FALSE) {
@@ -188,7 +197,7 @@ class Produk extends BaseController
      */
     public function delete($id = null)
     {
-        $model = new ProdukModel();
+        $model = new StatusPembayaranModel();
         if (empty($this->user)) {
             $response = [
                 'status' => 401,

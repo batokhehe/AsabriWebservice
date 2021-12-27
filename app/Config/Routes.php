@@ -50,6 +50,7 @@ $routes->group('api', function ($routes) {
     $routes->resource('cacatGolongan');
     $routes->resource('cacatTingkat');
     $routes->resource('peserta');
+    $routes->resource('batchPeserta');
     $routes->resource('keluarga');
     $routes->resource('penerimaPensiun');
     $routes->resource('pesertaPangkat');
@@ -62,6 +63,22 @@ $routes->group('api', function ($routes) {
     $routes->resource('pembayaranPensiunManfaat');
     $routes->resource('batchPembayaran');
     $routes->resource('pesertaHutang');
+    $routes->resource('pesertaRekening');
+    $routes->resource('pesertaGaji');
+    $routes->resource('pesertaMitraBayar');
+    $routes->resource('mitraBayarCabang');
+    $routes->resource('faskes');
+    $routes->resource('manfaat');
+    $routes->resource('klaimManfaat');
+    $routes->resource('produk');
+    $routes->resource('produkManfaat');
+    $routes->resource('golonganPangkat');
+    $routes->resource('dokumenKlaimProduk');
+    $routes->resource('manfaatKomponen');
+    $routes->resource('pesertaManfaat');
+    $routes->resource('statusPembayaran');
+    $routes->resource('laporSptb');
+    $routes->resource('pesertaMutasi');
 
     //Peserta
     $routes->resource('kantorCabang');
@@ -78,6 +95,7 @@ $routes->group('api', function ($routes) {
     $routes->resource('statusPeserta');
     $routes->resource('tipeDokumen');
     $routes->resource('tipePembayaran');
+    $routes->resource('pesertaProduk');
     // untested
 });
 

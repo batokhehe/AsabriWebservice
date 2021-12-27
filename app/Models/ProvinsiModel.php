@@ -114,7 +114,7 @@ class ProvinsiModel extends Model
         ]);
     }
 
-     public static function softDelete($id, $model, $user){
+    public static function softDelete($id, $model, $user){
         return $model->update($id,[
             'deleted_status' => 1,
             'deleted_by' => $user->data->email,

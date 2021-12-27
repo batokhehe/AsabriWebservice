@@ -45,7 +45,6 @@ class ManfaatModel extends Model
 
     // Validation
     protected $validationRules      = [
-        'manfaat_id'=>'required',
         'manfaat_unique_code'=>'required',
         'nama_manfaat'=>'required',
         'kode_manfaat'=>'required',
@@ -83,10 +82,8 @@ class ManfaatModel extends Model
         return $model->where([$model->primaryKey => $id])->where(['deleted_status'=> 0])->first();
     }
 
-    public static function createNew($request, $user){
-        $model = new ManfaatModel();
+    public static function createNew($model, $request, $user){
         return $model->insert([
-            'manfaat_id'=> $request->getVar('manfaat_id'),
             'manfaat_unique_code'=> $request->getVar('manfaat_unique_code'),
             'nama_manfaat'=> $request->getVar('nama_manfaat'),
             'kode_manfaat'=> $request->getVar('kode_manfaat'),
@@ -105,10 +102,8 @@ class ManfaatModel extends Model
         ]) ;
     }
 
-    public static function updateData($id, $request, $user){
-        $model = new ManfaatModel();
+    public static function updateData($id, $model, $request, $user){
         return $model->update($id, [
-            'manfaat_id'=> $request->getVar('manfaat_id'),
             'manfaat_unique_code'=> $request->getVar('manfaat_unique_code'),
             'nama_manfaat'=> $request->getVar('nama_manfaat'),
             'kode_manfaat'=> $request->getVar('kode_manfaat'),
@@ -125,12 +120,21 @@ class ManfaatModel extends Model
         ]);
     }
 
-    public static function softDelete($id, $user){
-        $model = new ManfaatModel();
-        $model->update($id,[
+    public static function softDelete($id, $model, $user){
+        return $model->update($id,[
             'deleted_status'=> 1,
             'deleted_by'=> $user->data->email,
             'deleted_date'=> date('Y-m-d H:i:s')
         ]);
+    }
+
+    public function getAvailableId($model){
+        $result = $model->findAll();
+        if (count($result) > 0) {
+            return $result[count($result) - 1][$model->primaryKey] + 1;
+        } else {
+            return 1;
+        }
+
     }
 }

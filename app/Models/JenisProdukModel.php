@@ -17,7 +17,7 @@ class JenisProdukModel extends Model
     protected $allowedFields    = [
         'jenis_produk_id',
         'jenis_produk_unique_code',
-        'nam_jenis_produk',
+        'nama_jenis_produk',
         'kode_jenis_produk',
         'deskripsi',
         'created_by',
@@ -83,7 +83,6 @@ class JenisProdukModel extends Model
 
     public static function createNew($model, $request, $user){
         return $model->insert([
-            $model->primaryKey => $model->getAvailableId($model),
             'jenis_produk_unique_code' => $request->getVar('jenis_produk_unique_code'),
             'nama_jenis_produk' => $request->getVar('nama_jenis_produk'),
             'kode_jenis_produk' => $request->getVar('kode_jenis_produk'),
