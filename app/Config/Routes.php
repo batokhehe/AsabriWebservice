@@ -79,6 +79,17 @@ $routes->group('api', function ($routes) {
     $routes->resource('statusPembayaran');
     $routes->resource('laporSptb');
     $routes->resource('pesertaMutasi');
+    $routes->resource('pesertaIuran');
+    $routes->resource('pesertaBintangJasa');
+    $routes->resource('pembayaranHutangPeserta');
+    $routes->resource('otentikasiPensiun');
+    $routes->resource('laporanSptbPeserta');
+    $routes->resource('klaimBatch');
+    $routes->resource('sumberKlaim');
+    $routes->resource('pendelegasianWewenang');
+    $routes->resource('produkPremi');
+    $routes->resource('penghasilan');
+    $routes->resource('ktpaGenerator');
 
     //Peserta
     $routes->resource('kantorCabang');
