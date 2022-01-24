@@ -37,6 +37,7 @@ $routes->group('api', function ($routes) {
     $routes->post('register', 'User::register');
     $routes->post('login', 'User::login');
     $routes->get('profile', 'User::details');
+    $routes->resource('user');
     $routes->resource('provinsi');
     $routes->resource('kota');
     $routes->resource('kecamatan');
@@ -90,6 +91,8 @@ $routes->group('api', function ($routes) {
     $routes->resource('produkPremi');
     $routes->resource('penghasilan');
     $routes->resource('ktpaGenerator');
+    $routes->resource('appMenu');
+    $routes->resource('userMenu');
 
     //Peserta
     $routes->resource('kantorCabang');

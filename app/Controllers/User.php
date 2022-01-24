@@ -8,6 +8,31 @@ use \Firebase\JWT\JWT;
 
 class User extends BaseController
 {
+    public $modulName = 'User';
+
+    public function index()
+    {
+        if (empty($this->user)) {
+            $response = [
+                'status' => 401,
+                'error' => true,
+                'messages' => 'Access denied',
+                'data' => []
+            ];
+            return $this->respondCreated($response);
+        }
+      
+        $data = UserModel::getAll();
+      
+        $response = [
+            'status' => 200,
+            'error' => null,
+            'messages' => $this->modulName . ' Data ' . count($data) . ' Found',
+            'data' => $data,
+        ];
+        return $this->respond($response);
+    }
+
     public function register()
     {
         $rules = [
@@ -50,7 +75,7 @@ class User extends BaseController
         $userModel = new UserModel();
 
         $data = [
-            'user_id' => 1,
+            'user_id' => $this->getAvailableId($userModel),
             'nama_user' => $this->request->getVar('nama_user'),
             'user_unique_code' => $this->request->getVar('user_unique_code'),
             'kode_user' => $this->request->getVar('kode_user'),
@@ -193,5 +218,123 @@ class User extends BaseController
             ];
             return $this->respondCreated($response);
         }
+    }
+
+    public function update($id = null)
+    {
+        $rules = [
+            'nama_user' => 'required',
+            'user_unique_code' => 'required|is_unique[mst_user.user_unique_code]',
+            'kode_user' => 'required|is_unique[mst_user.kode_user]',
+            'email' => 'required|valid_email|is_unique[mst_user.email]|min_length[6]',
+            'user_password' => 'required',
+        ];
+
+        $messages = [
+            'nama_user' => [
+                'required' => 'Name is required'
+            ],
+            'user_unique_code' => [
+                'required' => 'Kode Unik is required'
+            ],
+            'kode_user' => [
+                'required' => 'Kode is required'
+            ],
+            'email' => [
+                'required' => 'Email required',
+                'valid_email' => 'Email address is not in format'
+            ],
+            'user_password' => [
+                'required' => 'password is required'
+            ],
+        ];
+
+        if (!$this->validate($rules, $messages)) {
+
+            $response = [
+                'status' => 500,
+                'error' => true,
+                'message' => $this->validator->getErrors(),
+                'data' => []
+            ];
+        } 
+
+        $userModel = new UserModel();
+
+        $data = [
+            'nama_user' => $this->request->getVar('nama_user'),
+            'user_unique_code' => $this->request->getVar('user_unique_code'),
+            'kode_user' => $this->request->getVar('kode_user'),
+            'email' => $this->request->getVar('email'),
+            'user_login' => $this->request->getVar('email'),
+            'user_password' => password_hash($this->request->getVar('user_password'), PASSWORD_DEFAULT),
+        ];
+
+        $userModel->update($id, $data);
+
+        $response = [
+            'status' => 200,
+            'error' => false,
+            'messages' => 'Successfully, user has been updated',
+            'data' => []
+        ];
+
+        return $this->respondCreated($response);
+    }
+
+    /**
+     * Delete the designated resource object from the model
+     *
+     * @return mixed
+     */
+    public function delete($id = null)
+    {
+        $model = new UserModel();
+        if (empty($this->user)) {
+            $response = [
+                'status' => 401,
+                'error' => true,
+                'messages' => 'Access denied',
+                'data' => []
+            ];
+            return $this->respondCreated($response);
+        }
+
+         // check availability
+        if ($model->findById($id) === FALSE){
+            return $this->respondCreated([
+                'status' => 404,
+                'error' => true,
+                'message' => 'Designated data to delete not found',
+                'data' => []
+            ]);
+        }
+
+        $result = $model->softDelete($id, $model, $this->user);
+
+        if ($result === FALSE) {
+            $response = [
+                'status' => 500,
+                'error' => true,
+                'messages' => 'Data Failed to Deleted'
+            ];
+        } else {
+            $response = [
+                'status' => 200,
+                'error' => null,
+                'messages' => 'Data Deleted'
+            ];
+        }
+        return $this->respond($response);
+    }
+
+    public function getAvailableId($model){
+        $result = $model->findAll();
+        if (count($result) > 0) {
+            return $result[count($result) - 1][$model->primaryKey] + 1;
+        } else {
+            return 1;
+        }
+
     }
 }

@@ -1,12 +1,12 @@
 <?php
 
 namespace App\Controllers;
-use App\Models\ProvinsiModel;
+use App\Models\UserMenuModel;
 
-class Provinsi extends BaseController
+class UserMenu extends BaseController
 {
 
-    public $modulName = 'Provinsi';
+    public $modulName = 'User Menu';
 
    /**
      * Return an array of resource objects, themselves in array format
@@ -25,7 +25,7 @@ class Provinsi extends BaseController
             return $this->respondCreated($response);
         }
       
-        $data = ProvinsiModel::getAll();
+        $data = UserMenuModel::getAll();
       
         $response = [
             'status' => 200,
@@ -53,7 +53,7 @@ class Provinsi extends BaseController
             return $this->respondCreated($response);
         }
 
-        $result = ProvinsiModel::findById($id);
+        $result = UserMenuModel::findById($id);
 
         if ($result) {
             $response = [
@@ -95,7 +95,7 @@ class Provinsi extends BaseController
             return $this->respondCreated($response);
         }
 
-        $model = new ProvinsiModel();
+        $model = new UserMenuModel();
 
         if (!$this->validate($model->validationRules, $model->validationMessages)) {
             $response = [
@@ -151,7 +151,7 @@ class Provinsi extends BaseController
             return $this->respondCreated($response);
         }
 
-        $model = new ProvinsiModel();
+        $model = new UserMenuModel();
 
         if (!$this->validate($model->validationRules, $model->validationMessages)) {
 
@@ -197,7 +197,7 @@ class Provinsi extends BaseController
      */
     public function delete($id = null)
     {
-        $model = new ProvinsiModel();
+        $model = new UserMenuModel();
         if (empty($this->user)) {
             $response = [
                 'status' => 401,

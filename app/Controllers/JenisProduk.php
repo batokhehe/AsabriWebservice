@@ -196,7 +196,7 @@ class JenisProduk extends BaseController
         }
 
          // check availability
-        if ($model->findById($id) === FALSE){
+        if (!$model->findById($id)){
             return $this->respondCreated([
                 'status' => 404,
                 'error' => true,

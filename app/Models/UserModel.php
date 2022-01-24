@@ -54,4 +54,23 @@ class UserModel extends Model
     protected $afterFind            = [];
     protected $beforeDelete         = [];
     protected $afterDelete          = [];
+
+    public static function getAll(){
+        $model = new UserModel();
+        return $model->where(['deleted_status' => 0])->findAll();
+    }
+
+    public static function findById($id){
+        $model = new UserModel();
+        return $model->where([$model->primaryKey => $id])->where(['deleted_status' => 0])->first();
+    }
+
+    public static function softDelete($id, $model, $user){
+        return $model->update($id,[
+            'deleted_status' => 1,
+            'deleted_by' => $user->data->email,
+            'deleted_date' => date('Y-m-d H:i:s')
+        ]);
+    }
+
 }

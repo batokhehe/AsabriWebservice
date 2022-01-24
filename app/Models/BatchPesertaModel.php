@@ -32,9 +32,9 @@ class BatchPesertaModel extends Model
     protected $deletedField  = 'deleted_at';
 
     // Validation
-    protected $validationRules      = [
-        'batch_peserta_unique_code'=> 'required',
-        'status'=> 'required',
+    protected $validationRules = [
+        'batch_peserta_unique_code' => 'required',
+        'status'                    => 'required',
 
     ];
     protected $validationMessages   = [];
@@ -52,50 +52,56 @@ class BatchPesertaModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public static function getAll(){
+    public static function getAll()
+    {
         $model = new BatchPesertaModel();
         return $model->findAll();
     }
 
-    public static function findById($id){
+    public static function findById($id)
+    {
         $model = new BatchPesertaModel();
         return $model->where([$model->primaryKey => $id])->first();
     }
 
-    public static function createNew($model, $request, $user){
+    public static function createNew($model, $request, $user)
+    {
         return $model->insert([
-            $model->primaryKey => $model->getAvailableId($model),
-            'batch_peserta_unique_code'=> $request->getVar('batch_peserta_unique_code'),
-            'upload_status'=> $request->getVar('upload_status'),
-            'status'=> $request->getVar('status'),
+            $model->primaryKey          => $model->getAvailableId($model),
+            'batch_peserta_unique_code' => $request->getVar('batch_peserta_unique_code'),
+            'upload_status'             => $request->getVar('upload_status'),
+            'status'                    => $request->getVar('status'),
 
-            'upload_date '=> date('Y-m-d H:i:s'),
-            'upload_by'=> $user->data->email,
+            'upload_date '              => date('Y-m-d H:i:s'),
+            'upload_by'                 => $user->data->email,
         ]);
 
     }
-    
-    public static function updateData($id, $model, $request, $user){
+
+    public static function updateData($id, $model, $request, $user)
+    {
         return $model->update($id, [
-            'batch_peserta_unique_code'=> $request->getVar('batch_peserta_unique_code'),
-            'upload_status'=> 1,
-            'status'=> $request->getVar('status'),
+            'batch_peserta_unique_code' => $request->getVar('batch_peserta_unique_code'),
+            'upload_status'             => 1,
+            'status'                    => $request->getVar('status'),
 
-            'upload_date '=> date('Y-m-d H:i:s'),
-            'upload_by'=> $user->data->email,
+            'upload_date '              => date('Y-m-d H:i:s'),
+            'upload_by'                 => $user->data->email,
         ]);
     }
 
-    public static function softDelete($id, $user){
+    public static function softDelete($id, $user)
+    {
         $model = new BatchPesertaModel();
-        $model->update($id,[
-            'deleted_status'=> 1,
-            'deleted_by'=> $user->data->email,
-            'deleted_date'=> date('Y-m-d H:i:s')
+        $model->update($id, [
+            'deleted_status' => 1,
+            'deleted_by'     => $user->data->email,
+            'deleted_date'   => date('Y-m-d H:i:s'),
         ]);
     }
 
-    public function getAvailableId($model){
+    public function getAvailableId($model)
+    {
         $result = $model->findAll();
         if (count($result) > 0) {
             return $result[count($result) - 1][$model->primaryKey] + 1;
