@@ -6,12 +6,12 @@ use CodeIgniter\Model;
 
 class KtpaGeneratorModel extends Model
 {
-    protected $DBGroup          ='default';
-    protected $table            ='mst_ktpa_generator';
-    protected $primaryKey       ='ktpa_generator_id';
+    protected $DBGroup          = 'default';
+    protected $table            = 'mst_ktpa_generator';
+    protected $primaryKey       = 'ktpa_generator_id';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
-    protected $returnType       ='array';
+    protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
@@ -24,16 +24,16 @@ class KtpaGeneratorModel extends Model
 
     // Dates
     protected $useTimestamps = false;
-    protected $dateFormat    ='datetime';
-    protected $createdField  ='created_at';
-    protected $updatedField  ='updated_at';
-    protected $deletedField  ='deleted_at';
+    protected $dateFormat    = 'datetime';
+    protected $createdField  = 'created_at';
+    protected $updatedField  = 'updated_at';
+    protected $deletedField  = 'deleted_at';
 
     // Validation
-    protected $validationRules      = [
-        'unit_organisasi_id'=>'required',
-        'golongan_pangkat_id'=>'required',
-        'ktpa_prefix'=>'required',
+    protected $validationRules = [
+        'unit_organisasi_id'  => 'required|is_unit_organisasi_exists[unit_organisasi_id]',
+        'golongan_pangkat_id' => 'required|is_golongan_pangkat_exists[golongan_pangkat_id]',
+        'ktpa_prefix'         => 'required',
 
     ];
     protected $validationMessages   = [];
@@ -51,46 +51,53 @@ class KtpaGeneratorModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public static function getAll(){
+    public static function getAll()
+    {
         $model = new KtpaGeneratorModel();
         return $model->findAll();
     }
 
-    public static function findById($id){
+    public static function findById($id)
+    {
         $model = new KtpaGeneratorModel();
         return $model->where([$model->primaryKey => $id])->first();
     }
 
-    public static function createNew($model, $request, $user){
+    public static function createNew($model, $request, $user)
+    {
         return $model->insert([
-            $model->primaryKey => $model->getAvailableId($model),
-            'unit_organisasi_id'=> $request->getVar('unit_organisasi_id'),
-            'golongan_pangkat_id'=> $request->getVar('golongan_pangkat_id'),
-            'ktpa_prefix'=> $request->getVar('ktpa_prefix'),
+            $model->primaryKey    => $model->getAvailableId($model),
+            'unit_organisasi_id'  => $request->getVar('unit_organisasi_id'),
+            'golongan_pangkat_id' => $request->getVar('golongan_pangkat_id'),
+            'ktpa_prefix'         => $request->getVar('ktpa_prefix'),
 
         ]);
     }
 
-    public static function updateData($id, $model, $request, $user){
+    public static function updateData($id, $model, $request, $user)
+    {
         return $model->update($id, [
-            'unit_organisasi_id'=> $request->getVar('unit_organisasi_id'),
-            'golongan_pangkat_id'=> $request->getVar('golongan_pangkat_id'),
-            'ktpa_prefix'=> $request->getVar('ktpa_prefix'),
+            'unit_organisasi_id'  => $request->getVar('unit_organisasi_id'),
+            'golongan_pangkat_id' => $request->getVar('golongan_pangkat_id'),
+            'ktpa_prefix'         => $request->getVar('ktpa_prefix'),
 
         ]);
     }
 
-    public static function softDelete($id, $model, $user){
+    public static function softDelete($id, $model, $user)
+    {
         return $model->delete($id);
     }
 
-    public function getAvailableId($model){
-        $result = $model->findAll();
-        if (count($result) > 0) {
-            return $result[count($result) - 1][$model->primaryKey] + 1;
+    public function getAvailableId($model)
+    {
+        $result = $model->orderBy($model->primaryKey, 'ASC')->findColumn($model->primaryKey);
+        if (!empty($result) > 0) {
+            return $result[count($result) - 1] + 1;
         } else {
             return 1;
         }
 
     }
+
 }

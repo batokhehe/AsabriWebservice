@@ -6,12 +6,13 @@ use CodeIgniter\Model;
 
 class ManfaatModel extends Model
 {
-    protected $DBGroup          ='default';
-    protected $table            ='mst_manfaat';
-    protected $primaryKey       ='manfaat_id';
+    protected $DBGroup          = 'default';
+    protected $table            = 'mst_manfaat';
+    protected $primaryKey       = 'manfaat_id';
+    protected $uniqueCode       = 'manfaat_unique_code';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
-    protected $returnType       ='array';
+    protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
@@ -38,23 +39,21 @@ class ManfaatModel extends Model
 
     // Dates
     protected $useTimestamps = false;
-    protected $dateFormat    ='datetime';
-    protected $createdField  ='created_at';
-    protected $updatedField  ='updated_at';
-    protected $deletedField  ='deleted_at';
+    protected $dateFormat    = 'datetime';
+    protected $createdField  = 'created_at';
+    protected $updatedField  = 'updated_at';
+    protected $deletedField  = 'deleted_at';
 
     // Validation
-    protected $validationRules      = [
-        'manfaat_unique_code'=>'required',
-        'nama_manfaat'=>'required',
-        'kode_manfaat'=>'required',
-        'jenis_klaim_id'=>'required',
-        'nama_jenis_klaim'=>'required',
-        'jenis_klaim_unique_code'=>'required',
-        'deskripsi'=>'required',
-        'is_asuransi'=>'required',
-        'is_dana_pensiun'=>'required',
-        'status'=>'required',
+    protected $validationRules = [
+        'manfaat_unique_code' => 'required',
+        'nama_manfaat'        => 'required',
+        'kode_manfaat'        => 'required',
+        'jenis_klaim_id'      => 'required|is_jenis_klaim_exists[jenis_klaim_id]',
+        'deskripsi'           => 'required',
+        'is_asuransi'         => 'required',
+        'is_dana_pensiun'     => 'required',
+        'status'              => 'required',
 
     ];
     protected $validationMessages   = [];
@@ -72,69 +71,88 @@ class ManfaatModel extends Model
     protected $beforeDelete   = [];
     protected $afterDelete    = [];
 
-    public static function getAll(){
+    public static function getAll()
+    {
         $model = new ManfaatModel();
-        return $model->where(['deleted_status'=> 0])->findAll();
+        return $model->where(['deleted_status' => 0])->findAll();
     }
 
-    public static function findById($id){
+    public static function findById($id)
+    {
         $model = new ManfaatModel();
-        return $model->where([$model->primaryKey => $id])->where(['deleted_status'=> 0])->first();
+        return $model->where([$model->primaryKey => $id])->where(['deleted_status' => 0])->first();
     }
 
-    public static function createNew($model, $request, $user){
+    public static function createNew($model, $request, $user)
+    {
+        $jenisKlaim = JenisKlaimModel::findById($request->getVar('jenis_klaim_id'));
+
         return $model->insert([
-            'manfaat_unique_code'=> $request->getVar('manfaat_unique_code'),
-            'nama_manfaat'=> $request->getVar('nama_manfaat'),
-            'kode_manfaat'=> $request->getVar('kode_manfaat'),
-            'jenis_klaim_id'=> $request->getVar('jenis_klaim_id'),
-            'nama_jenis_klaim'=> $request->getVar('nama_jenis_klaim'),
-            'jenis_klaim_unique_code'=> $request->getVar('jenis_klaim_unique_code'),
-            'deskripsi'=> $request->getVar('deskripsi'),
-            'is_asuransi'=> $request->getVar('is_asuransi'),
-            'is_dana_pensiun'=> $request->getVar('is_dana_pensiun'),
-            'status'=> $request->getVar('status'),
+            'manfaat_unique_code'     => $request->getVar('manfaat_unique_code'),
+            'nama_manfaat'            => $request->getVar('nama_manfaat'),
+            'kode_manfaat'            => $request->getVar('kode_manfaat'),
+            'jenis_klaim_id'          => $request->getVar('jenis_klaim_id'),
+            'nama_jenis_klaim'        => $jenisKlaim['nama_jenis_klaim'],
+            'jenis_klaim_unique_code' => $jenisKlaim['jenis_klaim_unique_code'],
+            'deskripsi'               => $request->getVar('deskripsi'),
+            'is_asuransi'             => $request->getVar('is_asuransi'),
+            'is_dana_pensiun'         => $request->getVar('is_dana_pensiun'),
+            'status'                  => $request->getVar('status'),
 
-
-            'created_date'=> date('Y-m-d H:i:s'),
-            'created_by'=> $user->data->email,
-            'deleted_status'=>  0, 
-        ]) ;
+            'created_date'            => date('Y-m-d H:i:s'),
+            'created_by'              => $user->data->email,
+            'deleted_status'          => 0,
+        ]);
     }
 
-    public static function updateData($id, $model, $request, $user){
+    public static function updateData($id, $model, $request, $user)
+    {
+        $jenisKlaim = JenisKlaimModel::findById($request->getVar('jenis_klaim_id'));
+
         return $model->update($id, [
-            'manfaat_unique_code'=> $request->getVar('manfaat_unique_code'),
-            'nama_manfaat'=> $request->getVar('nama_manfaat'),
-            'kode_manfaat'=> $request->getVar('kode_manfaat'),
-            'jenis_klaim_id'=> $request->getVar('jenis_klaim_id'),
-            'nama_jenis_klaim'=> $request->getVar('nama_jenis_klaim'),
-            'jenis_klaim_unique_code'=> $request->getVar('jenis_klaim_unique_code'),
-            'deskripsi'=> $request->getVar('deskripsi'),
-            'is_asuransi'=> $request->getVar('is_asuransi'),
-            'is_dana_pensiun'=> $request->getVar('is_dana_pensiun'),
-            'status'=> $request->getVar('status'),
+            'manfaat_unique_code'     => $request->getVar('manfaat_unique_code'),
+            'nama_manfaat'            => $request->getVar('nama_manfaat'),
+            'kode_manfaat'            => $request->getVar('kode_manfaat'),
+            'jenis_klaim_id'          => $request->getVar('jenis_klaim_id'),
+            'nama_jenis_klaim'        => $jenisKlaim['nama_jenis_klaim'],
+            'jenis_klaim_unique_code' => $jenisKlaim['jenis_klaim_unique_code'],
+            'deskripsi'               => $request->getVar('deskripsi'),
+            'is_asuransi'             => $request->getVar('is_asuransi'),
+            'is_dana_pensiun'         => $request->getVar('is_dana_pensiun'),
+            'status'                  => $request->getVar('status'),
 
-            'last_update_by'=> $user->data->email, 
-            'last_update_date'=> date('Y-m-d H:i:s'),
+            'last_update_by'          => $user->data->email,
+            'last_update_date'        => date('Y-m-d H:i:s'),
         ]);
     }
 
-    public static function softDelete($id, $model, $user){
-        return $model->update($id,[
-            'deleted_status'=> 1,
-            'deleted_by'=> $user->data->email,
-            'deleted_date'=> date('Y-m-d H:i:s')
+    public static function softDelete($id, $model, $user)
+    {
+        return $model->update($id, [
+            'deleted_status' => 1,
+            'deleted_by'     => $user->data->email,
+            'deleted_date'   => date('Y-m-d H:i:s'),
         ]);
     }
 
-    public function getAvailableId($model){
-        $result = $model->findAll();
-        if (count($result) > 0) {
-            return $result[count($result) - 1][$model->primaryKey] + 1;
+    public function getAvailableId($model)
+    {
+        $result = $model->orderBy($model->primaryKey, 'ASC')->findColumn($model->primaryKey);
+        if (!empty($result) > 0) {
+            return $result[count($result) - 1] + 1;
         } else {
             return 1;
         }
 
+    }
+
+    public function isUniqueCode($model, $uniqueCode, $id)
+    {
+        $model->where($this->uniqueCode, $uniqueCode);
+        if ($id != null) {
+            $model->where($this->primaryKey . ' !=', $id);
+        }
+        $result = $model->findAll();
+        return count($result);
     }
 }

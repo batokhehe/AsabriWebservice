@@ -14,21 +14,21 @@ class User extends BaseController
     {
         if (empty($this->user)) {
             $response = [
-                'status' => 401,
-                'error' => true,
+                'status'   => 401,
+                'error'    => true,
                 'messages' => 'Access denied',
-                'data' => []
+                'data'     => [],
             ];
             return $this->respondCreated($response);
         }
-      
+
         $data = UserModel::getAll();
-      
+
         $response = [
-            'status' => 200,
-            'error' => null,
+            'status'   => 200,
+            'error'    => null,
             'messages' => $this->modulName . ' Data ' . count($data) . ' Found',
-            'data' => $data,
+            'data'     => $data,
         ];
         return $this->respond($response);
     }
@@ -36,61 +36,61 @@ class User extends BaseController
     public function register()
     {
         $rules = [
-            'nama_user' => 'required',
+            'nama_user'        => 'required',
             'user_unique_code' => 'required|is_unique[mst_user.user_unique_code]',
-            'kode_user' => 'required|is_unique[mst_user.kode_user]',
-            'email' => 'required|valid_email|is_unique[mst_user.email]|min_length[6]',
-            'user_password' => 'required',
+            'kode_user'        => 'required|is_unique[mst_user.kode_user]',
+            'email'            => 'required|valid_email|is_unique[mst_user.email]|min_length[6]',
+            'user_password'    => 'required',
         ];
 
         $messages = [
-            'nama_user' => [
-                'required' => 'Name is required'
+            'nama_user'        => [
+                'required' => 'Name is required',
             ],
             'user_unique_code' => [
-                'required' => 'Kode Unik is required'
+                'required' => 'Kode Unik is required',
             ],
-            'kode_user' => [
-                'required' => 'Kode is required'
+            'kode_user'        => [
+                'required' => 'Kode is required',
             ],
-            'email' => [
-                'required' => 'Email required',
-                'valid_email' => 'Email address is not in format'
+            'email'            => [
+                'required'    => 'Email required',
+                'valid_email' => 'Email address is not in format',
             ],
-            'user_password' => [
-                'required' => 'password is required'
+            'user_password'    => [
+                'required' => 'password is required',
             ],
         ];
 
         if (!$this->validate($rules, $messages)) {
 
             $response = [
-                'status' => 500,
-                'error' => true,
+                'status'  => 500,
+                'error'   => true,
                 'message' => $this->validator->getErrors(),
-                'data' => []
+                'data'    => [],
             ];
-        } 
+        }
 
         $userModel = new UserModel();
 
         $data = [
-            'user_id' => $this->getAvailableId($userModel),
-            'nama_user' => $this->request->getVar('nama_user'),
+            'user_id'          => $this->getAvailableId($userModel),
+            'nama_user'        => $this->request->getVar('nama_user'),
             'user_unique_code' => $this->request->getVar('user_unique_code'),
-            'kode_user' => $this->request->getVar('kode_user'),
-            'email' => $this->request->getVar('email'),
-            'user_login' => $this->request->getVar('email'),
-            'user_password' => password_hash($this->request->getVar('user_password'), PASSWORD_DEFAULT),
+            'kode_user'        => $this->request->getVar('kode_user'),
+            'email'            => $this->request->getVar('email'),
+            'user_login'       => $this->request->getVar('email'),
+            'user_password'    => password_hash($this->request->getVar('user_password'), PASSWORD_DEFAULT),
         ];
 
         $userModel->insert($data);
 
         $response = [
-            'status' => 200,
-            'error' => false,
+            'status'   => 200,
+            'error'    => false,
             'messages' => 'Successfully, user has been registered',
-            'data' => []
+            'data'     => [],
         ];
 
         return $this->respondCreated($response);
@@ -104,31 +104,31 @@ class User extends BaseController
     public function login()
     {
         $rules = [
-            'user_login' => 'required|valid_email|min_length[6]',
+            'user_login'    => 'required|valid_email|min_length[6]',
             'user_password' => 'required',
         ];
 
         $messages = [
-            'user_login' => [
-                'required' => 'User login required',
-                'valid_email' => 'User login is not in format'
+            'user_login'    => [
+                'required'    => 'User login required',
+                'valid_email' => 'User login is not in format',
             ],
             'user_password' => [
-                'required' => 'User password is required'
+                'required' => 'User password is required',
             ],
         ];
 
         if (!$this->validate($rules, $messages)) {
 
             $response = [
-                'status' => 500,
-                'error' => true,
+                'status'  => 500,
+                'error'   => true,
                 'message' => $this->validator->getErrors(),
-                'data' => []
+                'data'    => [],
             ];
 
             return $this->respondCreated($response);
-            
+
         } else {
             $userModel = new UserModel();
 
@@ -145,41 +145,41 @@ class User extends BaseController
                     $exp = $iat + 3600 * 100000;
 
                     $payload = array(
-                        'iss' => 'The_claim',
-                        'aud' => 'The_Aud',
-                        'iat' => $iat, // issued at
-                        'nbf' => $nbf, //not before in seconds
-                        'exp' => $exp, // expire time in seconds
+                        'iss'  => 'The_claim',
+                        'aud'  => 'The_Aud',
+                        'iat'  => $iat, // issued at
+                        'nbf'  => $nbf, //not before in seconds
+                        'exp'  => $exp, // expire time in seconds
                         'data' => $userdata,
                     );
 
                     $token = JWT::encode($payload, $key);
 
                     $response = [
-                        'status' => 200,
-                        'error' => false,
+                        'status'   => 200,
+                        'error'    => false,
                         'messages' => 'User logged In successfully',
-                        'data' => [
-                            'token' => $token
-                        ]
+                        'data'     => [
+                            'token' => $token,
+                        ],
                     ];
                     return $this->respondCreated($response);
                 } else {
 
                     $response = [
-                        'status' => 500,
-                        'error' => true,
+                        'status'   => 500,
+                        'error'    => true,
                         'messages' => 'Incorrect details',
-                        'data' => []
+                        'data'     => [],
                     ];
                     return $this->respondCreated($response);
                 }
             } else {
                 $response = [
-                    'status' => 500,
-                    'error' => true,
+                    'status'   => 500,
+                    'error'    => true,
                     'messages' => 'User not found',
-                    'data' => []
+                    'data'     => [],
                 ];
                 return $this->respondCreated($response);
             }
@@ -188,10 +188,10 @@ class User extends BaseController
 
     public function details()
     {
-        $key = $this->getKey();
+        $key        = $this->getKey();
         $authHeader = $this->request->getHeader('Authorization');
         $authHeader = $authHeader->getValue();
-        $token = $authHeader;
+        $token      = $authHeader;
 
         try {
             $decoded = JWT::decode($token, $key, array('HS256'));
@@ -199,22 +199,22 @@ class User extends BaseController
             if ($decoded) {
 
                 $response = [
-                    'status' => 200,
-                    'error' => false,
+                    'status'   => 200,
+                    'error'    => false,
                     'messages' => 'User details',
-                    'data' => [
-                        'profile' => $decoded
-                    ]
+                    'data'     => [
+                        'profile' => $decoded,
+                    ],
                 ];
                 return $this->respondCreated($response);
             }
         } catch (Exception $ex) {
-          
+
             $response = [
-                'status' => 401,
-                'error' => true,
+                'status'   => 401,
+                'error'    => true,
                 'messages' => 'Access denied',
-                'data' => []
+                'data'     => [],
             ];
             return $this->respondCreated($response);
         }
@@ -223,60 +223,60 @@ class User extends BaseController
     public function update($id = null)
     {
         $rules = [
-            'nama_user' => 'required',
+            'nama_user'        => 'required',
             'user_unique_code' => 'required|is_unique[mst_user.user_unique_code]',
-            'kode_user' => 'required|is_unique[mst_user.kode_user]',
-            'email' => 'required|valid_email|is_unique[mst_user.email]|min_length[6]',
-            'user_password' => 'required',
+            'kode_user'        => 'required|is_unique[mst_user.kode_user]',
+            'email'            => 'required|valid_email|is_unique[mst_user.email]|min_length[6]',
+            'user_password'    => 'required',
         ];
 
         $messages = [
-            'nama_user' => [
-                'required' => 'Name is required'
+            'nama_user'        => [
+                'required' => 'Name is required',
             ],
             'user_unique_code' => [
-                'required' => 'Kode Unik is required'
+                'required' => 'Kode Unik is required',
             ],
-            'kode_user' => [
-                'required' => 'Kode is required'
+            'kode_user'        => [
+                'required' => 'Kode is required',
             ],
-            'email' => [
-                'required' => 'Email required',
-                'valid_email' => 'Email address is not in format'
+            'email'            => [
+                'required'    => 'Email required',
+                'valid_email' => 'Email address is not in format',
             ],
-            'user_password' => [
-                'required' => 'password is required'
+            'user_password'    => [
+                'required' => 'password is required',
             ],
         ];
 
         if (!$this->validate($rules, $messages)) {
 
             $response = [
-                'status' => 500,
-                'error' => true,
+                'status'  => 500,
+                'error'   => true,
                 'message' => $this->validator->getErrors(),
-                'data' => []
+                'data'    => [],
             ];
-        } 
+        }
 
         $userModel = new UserModel();
 
         $data = [
-            'nama_user' => $this->request->getVar('nama_user'),
+            'nama_user'        => $this->request->getVar('nama_user'),
             'user_unique_code' => $this->request->getVar('user_unique_code'),
-            'kode_user' => $this->request->getVar('kode_user'),
-            'email' => $this->request->getVar('email'),
-            'user_login' => $this->request->getVar('email'),
-            'user_password' => password_hash($this->request->getVar('user_password'), PASSWORD_DEFAULT),
+            'kode_user'        => $this->request->getVar('kode_user'),
+            'email'            => $this->request->getVar('email'),
+            'user_login'       => $this->request->getVar('email'),
+            'user_password'    => password_hash($this->request->getVar('user_password'), PASSWORD_DEFAULT),
         ];
 
         $userModel->update($id, $data);
 
         $response = [
-            'status' => 200,
-            'error' => false,
+            'status'   => 200,
+            'error'    => false,
             'messages' => 'Successfully, user has been updated',
-            'data' => []
+            'data'     => [],
         ];
 
         return $this->respondCreated($response);
@@ -292,43 +292,44 @@ class User extends BaseController
         $model = new UserModel();
         if (empty($this->user)) {
             $response = [
-                'status' => 401,
-                'error' => true,
+                'status'   => 401,
+                'error'    => true,
                 'messages' => 'Access denied',
-                'data' => []
+                'data'     => [],
             ];
             return $this->respondCreated($response);
         }
 
-         // check availability
-        if ($model->findById($id) === FALSE){
+        // check availability
+        if ($model->findById($id) === false) {
             return $this->respondCreated([
-                'status' => 404,
-                'error' => true,
+                'status'  => 404,
+                'error'   => true,
                 'message' => 'Designated data to delete not found',
-                'data' => []
+                'data'    => [],
             ]);
         }
 
         $result = $model->softDelete($id, $model, $this->user);
 
-        if ($result === FALSE) {
+        if ($result === false) {
             $response = [
-                'status' => 500,
-                'error' => true,
-                'messages' => 'Data Failed to Deleted'
+                'status'   => 500,
+                'error'    => true,
+                'messages' => 'Data Failed to Deleted',
             ];
         } else {
             $response = [
-                'status' => 200,
-                'error' => null,
-                'messages' => 'Data Deleted'
+                'status'   => 200,
+                'error'    => null,
+                'messages' => 'Data Deleted',
             ];
         }
         return $this->respond($response);
     }
 
-    public function getAvailableId($model){
+    public function getAvailableId($model)
+    {
         $result = $model->findAll();
         if (count($result) > 0) {
             return $result[count($result) - 1][$model->primaryKey] + 1;

@@ -2,12 +2,12 @@
 
 namespace App\Controllers;
 
-use App\Models\PesertaModel;
+use App\Models\PensiunMitraBayarModel;
 
-class Peserta extends BaseController
+class PensiunMitraBayar extends BaseController
 {
 
-    public $modulName = 'Peserta';
+    public $modulName = 'Pensiun Mitra Bayar';
 
     /**
      * Return an array of resource objects, themselves in array format
@@ -26,7 +26,7 @@ class Peserta extends BaseController
             return $this->respondCreated($response);
         }
 
-        $data = PesertaModel::getAll();
+        $data = PensiunMitraBayarModel::getAll();
 
         $response = [
             'status'   => 200,
@@ -54,7 +54,7 @@ class Peserta extends BaseController
             return $this->respondCreated($response);
         }
 
-        $result = PesertaModel::findById($id);
+        $result = PensiunMitraBayarModel::findById($id);
 
         if ($result) {
             $response = [
@@ -95,7 +95,7 @@ class Peserta extends BaseController
             return $this->respondCreated($response);
         }
 
-        $model = new PesertaModel();
+        $model = new PensiunMitraBayarModel();
 
         if (!$this->validate($model->validationRules, $model->validationMessages)) {
             $response = [
@@ -106,6 +106,7 @@ class Peserta extends BaseController
             ];
             return $this->respondCreated($response);
         }
+
         if ($model->isUniqueCode($model, $this->request->getVar($model->uniqueCode), null) > 0) {
             $response = [
                 'status'   => 500,
@@ -158,7 +159,7 @@ class Peserta extends BaseController
             return $this->respondCreated($response);
         }
 
-        $model = new PesertaModel();
+        $model = new PensiunMitraBayarModel();
 
         if (!$this->validate($model->validationRules, $model->validationMessages)) {
 
@@ -211,7 +212,7 @@ class Peserta extends BaseController
      */
     public function delete($id = null)
     {
-        $model = new PesertaModel();
+        $model = new PensiunMitraBayarModel();
         if (empty($this->user)) {
             $response = [
                 'status'   => 401,

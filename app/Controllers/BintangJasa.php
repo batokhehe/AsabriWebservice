@@ -171,6 +171,14 @@ class BintangJasa extends BaseController
             ];
             return $this->respondCreated($response);
         }
+        if (!$model->findById($id)) {
+            return $this->respondCreated([
+                'status'  => 404,
+                'error'   => true,
+                'message' => 'Designated data to update not found',
+                'data'    => [],
+            ]);
+        }
         if ($model->isUniqueCode($model, $this->request->getVar($model->uniqueCode), $id) > 0) {
             $response = [
                 'status'   => 500,

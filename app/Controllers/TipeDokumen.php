@@ -13,21 +13,21 @@ class TipeDokumen extends BaseController
     {
         if (empty($this->user)) {
             $response = [
-                'status' => 401,
-                'error' => true,
+                'status'   => 401,
+                'error'    => true,
                 'messages' => 'Access denied',
-                'data' => []
+                'data'     => [],
             ];
             return $this->respondCreated($response);
         }
-      
+
         $data = TipeDokumenModel::getAll();
-      
+
         $response = [
-            'status' => 200,
-            'error' => null,
+            'status'   => 200,
+            'error'    => null,
             'messages' => $this->modulName . ' Data ' . count($data) . ' Found',
-            'data' => $data,
+            'data'     => $data,
         ];
         return $this->respond($response);
     }
@@ -41,10 +41,10 @@ class TipeDokumen extends BaseController
     {
         if (empty($this->user)) {
             $response = [
-                'status' => 401,
-                'error' => true,
+                'status'   => 401,
+                'error'    => true,
                 'messages' => 'Access denied',
-                'data' => []
+                'data'     => [],
             ];
             return $this->respondCreated($response);
         }
@@ -53,10 +53,10 @@ class TipeDokumen extends BaseController
 
         if ($result) {
             $response = [
-                'status' => 200,
-                'error' => null,
+                'status'   => 200,
+                'error'    => null,
                 'messages' => $this->modulName . ' Found',
-                'data' => $result,
+                'data'     => $result,
             ];
             return $this->respond($response);
         } else {
@@ -69,8 +69,7 @@ class TipeDokumen extends BaseController
      *
      * @return mixed
      */
-    public function new()
-    {
+    function new () {
         //
     }
 
@@ -83,10 +82,10 @@ class TipeDokumen extends BaseController
     {
         if (empty($this->user)) {
             $response = [
-                'status' => 401,
-                'error' => true,
+                'status'   => 401,
+                'error'    => true,
                 'messages' => 'Access denied',
-                'data' => []
+                'data'     => [],
             ];
             return $this->respondCreated($response);
         }
@@ -95,28 +94,36 @@ class TipeDokumen extends BaseController
 
         if (!$this->validate($model->validationRules, $model->validationMessages)) {
             $response = [
-                'status' => 500,
-                'error' => true,
+                'status'  => 500,
+                'error'   => true,
                 'message' => $this->validator->getErrors(),
-                'data' => []
+                'data'    => [],
             ];
             return $this->respondCreated($response);
         }
 
-        if ($model->createNew($model, $this->request, $this->user) === FALSE) {
+        if ($model->isUniqueCode($model, $this->request->getVar($model->uniqueCode), null) > 0) {
             $response = [
-                'status' => 500,
-                'error' => true,
-                'messages' => $this->modulName . ' Gagal Tersimpan',
-                'params' => $model->errors(),
-            ]; 
+                'status'   => 500,
+                'error'    => true,
+                'messages' => $this->modulName . ' Kode Unik sudah terpakai',
+            ];
         } else {
-            $response = [
-                'status' => 200,
-                'error' => null,
-                'messages' => $this->modulName . ' Berhasil Tersimpan '];
+            if ($model->createNew($model, $this->request, $this->user) === false) {
+                $response = [
+                    'status'   => 500,
+                    'error'    => true,
+                    'messages' => $this->modulName . ' Gagal Tersimpan',
+                    'params'   => $model->errors(),
+                ];
+            } else {
+                $response = [
+                    'status'   => 200,
+                    'error'    => null,
+                    'messages' => $this->modulName . ' Berhasil Tersimpan '];
+            }
         }
-      
+
         return $this->respondCreated($response);
     }
 
@@ -139,10 +146,10 @@ class TipeDokumen extends BaseController
     {
         if (empty($this->user)) {
             $response = [
-                'status' => 401,
-                'error' => true,
+                'status'   => 401,
+                'error'    => true,
                 'messages' => 'Access denied',
-                'data' => []
+                'data'     => [],
             ];
             return $this->respondCreated($response);
         }
@@ -152,28 +159,44 @@ class TipeDokumen extends BaseController
         if (!$this->validate($model->validationRules, $model->validationMessages)) {
 
             $response = [
-                'status' => 500,
-                'error' => true,
+                'status'  => 500,
+                'error'   => true,
                 'message' => $this->validator->getErrors(),
-                'data' => []
+                'data'    => [],
             ];
             return $this->respondCreated($response);
         }
 
-        if ($model->updateData($id, $model, $this->request, $this->user) === FALSE) {
-            $response = [
-                'status' => 500,
-                'error' => true,
-                'messages' => $this->modulName . ' Gagal Tersimpan',
-                'params' => $model->errors(),
-            ]; 
-        } else {
-            $response = [
-                'status' => 200,
-                'error' => null,
-                'messages' => $this->modulName . ' Berhasil Tersimpan '];
+        if (!$model->findById($id)) {
+            return $this->respondCreated([
+                'status'  => 404,
+                'error'   => true,
+                'message' => 'Designated data to update not found',
+                'data'    => [],
+            ]);
         }
-      
+        if ($model->isUniqueCode($model, $this->request->getVar($model->uniqueCode), $id) > 0) {
+            $response = [
+                'status'   => 500,
+                'error'    => true,
+                'messages' => $this->modulName . ' Kode Unik sudah terpakai',
+            ];
+        } else {
+            if ($model->updateData($id, $model, $this->request, $this->user) === false) {
+                $response = [
+                    'status'   => 500,
+                    'error'    => true,
+                    'messages' => $this->modulName . ' Gagal Tersimpan',
+                    'params'   => $model->errors(),
+                ];
+            } else {
+                $response = [
+                    'status'   => 200,
+                    'error'    => null,
+                    'messages' => $this->modulName . ' Berhasil Tersimpan '];
+            }
+        }
+
         return $this->respondCreated($response);
     }
 
@@ -187,37 +210,37 @@ class TipeDokumen extends BaseController
         $model = new TipeDokumenModel();
         if (empty($this->user)) {
             $response = [
-                'status' => 401,
-                'error' => true,
+                'status'   => 401,
+                'error'    => true,
                 'messages' => 'Access denied',
-                'data' => []
+                'data'     => [],
             ];
             return $this->respondCreated($response);
         }
 
-         // check availability
-        if ($model->findById($id) === FALSE){
+        // check availability
+        if ($model->findById($id) === false) {
             return $this->respondCreated([
-                'status' => 404,
-                'error' => true,
+                'status'  => 404,
+                'error'   => true,
                 'message' => 'Designated data to delete not found',
-                'data' => []
+                'data'    => [],
             ]);
         }
 
         $result = $model->softDelete($id, $model, $this->user);
 
-        if ($result === FALSE) {
+        if ($result === false) {
             $response = [
-                'status' => 500,
-                'error' => true,
-                'messages' => 'Data Failed to Deleted'
+                'status'   => 500,
+                'error'    => true,
+                'messages' => 'Data Failed to Deleted',
             ];
         } else {
             $response = [
-                'status' => 200,
-                'error' => null,
-                'messages' => 'Data Deleted'
+                'status'   => 200,
+                'error'    => null,
+                'messages' => 'Data Deleted',
             ];
         }
         return $this->respond($response);

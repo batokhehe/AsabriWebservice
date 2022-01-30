@@ -9,6 +9,7 @@ class BatchPesertaModel extends Model
     protected $DBGroup          = 'default';
     protected $table            = 'trx_batch_peserta';
     protected $primaryKey       = 'batch_peserta_id';
+    protected $uniqueCode       = 'batch_peserta_unique_code';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
     protected $returnType       = 'array';
@@ -102,12 +103,22 @@ class BatchPesertaModel extends Model
 
     public function getAvailableId($model)
     {
-        $result = $model->findAll();
-        if (count($result) > 0) {
-            return $result[count($result) - 1][$model->primaryKey] + 1;
+        $result = $model->orderBy($model->primaryKey, 'ASC')->findColumn($model->primaryKey);
+        if (!empty($result) > 0) {
+            return $result[count($result) - 1] + 1;
         } else {
             return 1;
         }
 
+    }
+
+    public function isUniqueCode($model, $uniqueCode, $id)
+    {
+        $model->where($this->uniqueCode, $uniqueCode);
+        if ($id != null) {
+            $model->where($this->primaryKey . ' !=', $id);
+        }
+        $result = $model->findAll();
+        return count($result);
     }
 }

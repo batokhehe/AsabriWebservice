@@ -181,9 +181,9 @@ class BintangJasaModel extends Model
 
     public function getAvailableId($model)
     {
-        $result = $model->findAll();
-        if (count($result) > 0) {
-            return $result[count($result) - 1][$model->primaryKey] + 1;
+        $result = $model->orderBy($model->primaryKey, 'ASC')->findColumn($model->primaryKey);
+        if (!empty($result) > 0) {
+            return $result[count($result) - 1] + 1;
         } else {
             return 1;
         }

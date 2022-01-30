@@ -9,6 +9,7 @@ class GolonganPangkatModel extends Model
     protected $DBGroup          ='default';
     protected $table            ='ref_golongan_pangkat';
     protected $primaryKey       ='golongan_pangkat_id';
+    protected $uniqueCode       ='golongan_pangkat_unique_code';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
     protected $returnType       ='array';
@@ -109,13 +110,24 @@ class GolonganPangkatModel extends Model
         ]);
     }
 
-    public function getAvailableId($model){
-        $result = $model->findAll();
-        if (count($result) > 0) {
-            return $result[count($result) - 1][$model->primaryKey] + 1;
+    public function getAvailableId($model)
+    {
+        $result = $model->orderBy($model->primaryKey, 'ASC')->findColumn($model->primaryKey);
+        if (!empty($result) > 0) {
+            return $result[count($result) - 1] + 1;
         } else {
             return 1;
         }
 
+    }
+
+    public function isUniqueCode($model, $uniqueCode, $id)
+    {
+        $model->where($this->uniqueCode, $uniqueCode);
+        if ($id != null) {
+            $model->where($this->primaryKey . ' !=', $id);
+        }
+        $result = $model->findAll();
+        return count($result);
     }
 }

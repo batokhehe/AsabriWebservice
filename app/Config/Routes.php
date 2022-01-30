@@ -66,7 +66,7 @@ $routes->group('api', function ($routes) {
     $routes->resource('pesertaHutang');
     $routes->resource('pesertaRekening');
     $routes->resource('pesertaGaji');
-    $routes->resource('pesertaMitraBayar');
+    $routes->resource('pensiunMitraBayar');
     $routes->resource('mitraBayarCabang');
     $routes->resource('faskes');
     $routes->resource('manfaat');
