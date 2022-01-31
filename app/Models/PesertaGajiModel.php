@@ -44,7 +44,6 @@ class PesertaGajiModel extends Model
         'peserta_gaji_unique_code' => 'required',
         'peserta_id'               => 'required|is_peserta_exists[peserta_id]',
         'status'                   => 'required',
-
     ];
     protected $validationMessages   = [];
     protected $skipValidation       = false;
@@ -73,6 +72,12 @@ class PesertaGajiModel extends Model
         return $model->where([$model->primaryKey => $id])->where(['deleted_status' => 0])->first();
     }
 
+    public static function deleteById($id)
+    {
+        $model = new PesertaGajiModel();
+        return $model->where([$model->primaryKey => $id])->delete();
+    }
+
     public static function createNew($model, $request, $user)
     {
         $peserta = PesertaModel::findById($request->getVar('peserta_id'));
@@ -93,7 +98,7 @@ class PesertaGajiModel extends Model
     public static function updateData($id, $model, $request, $user)
     {
         $peserta = PesertaModel::findById($request->getVar('peserta_id'));
-        
+
         return $model->update($id, [
             'peserta_gaji_unique_code' => $request->getVar('peserta_gaji_unique_code'),
             'peserta_id'               => $request->getVar('peserta_id'),

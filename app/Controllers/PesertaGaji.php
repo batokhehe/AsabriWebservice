@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Models\PesertaGajiDetailModel;
 use App\Models\PesertaGajiModel;
 
 class PesertaGaji extends BaseController
@@ -27,6 +28,9 @@ class PesertaGaji extends BaseController
         }
 
         $data = PesertaGajiModel::getAll();
+        for ($i = 0; $i < count($data); $i++) {
+            $data[$i]['detail'] = PesertaGajiDetailModel::findByHeaderId($data[$i]['peserta_gaji_id']);
+        }
 
         $response = [
             'status'   => 200,
@@ -54,7 +58,8 @@ class PesertaGaji extends BaseController
             return $this->respondCreated($response);
         }
 
-        $result = PesertaGajiModel::findById($id);
+        $result           = PesertaGajiModel::findById($id);
+        $result['detail'] = PesertaGajiDetailModel::findByHeaderId($id);
 
         if ($result) {
             $response = [
@@ -122,6 +127,23 @@ class PesertaGaji extends BaseController
                     'params'   => $model->errors(),
                 ];
             } else {
+                $id          = $model->insertID();
+                $modelDetail = new PesertaGajiDetailModel();
+                $modelDetail->clearAll($id, $modelDetail);
+
+                for ($i = 0; $i < count($this->request->getVar('detail')); $i++) {
+                    if ($modelDetail->createNew($modelDetail, $id, $this->request->getVar('peserta_gaji_unique_code'), $this->request->getVar('detail')[$i], $this->user) === false) {
+                        $model->deleteById($id);
+                        $modelDetail->clearAll($id, $modelDetail);
+                        return $this->respondCreated([
+                            'status'   => 500,
+                            'error'    => true,
+                            'messages' => 'Peserta Gaji Detail Gagal Tersimpan',
+                            'params'   => $modelDetail->errors(),
+                        ]);
+                    }
+                }
+
                 $response = [
                     'status'   => 200,
                     'error'    => null,
@@ -195,6 +217,21 @@ class PesertaGaji extends BaseController
                     'params'   => $model->errors(),
                 ];
             } else {
+                $modelDetail = new PesertaGajiDetailModel();
+                $modelDetail->clearAll($id, $modelDetail);
+
+                for ($i = 0; $i < count($this->request->getVar('detail')); $i++) {
+                    if ($modelDetail->createNew($modelDetail, $id, $this->request->getVar('peserta_gaji_unique_code'), $this->request->getVar('detail')[$i], $this->user) === false) {
+                        $modelDetail->clearAll($id, $modelDetail);
+                        return $this->respondCreated([
+                            'status'   => 500,
+                            'error'    => true,
+                            'messages' => 'Peserta Gaji Detail Gagal Tersimpan',
+                            'params'   => $modelDetail->errors(),
+                        ]);
+                    }
+                }
+
                 $response = [
                     'status'   => 200,
                     'error'    => null,
